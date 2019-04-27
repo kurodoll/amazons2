@@ -92,5 +92,69 @@ function validMove(from, to, board) {
   return false;
 }
 
+
+// ========================================================================= //
+//                                                 Board Analysis Functions //
+// ======================================================================= //
+function getBoardRegions(board) {
+  const free_tiles = [];
+
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board[x].length; y++) {
+      if (board[x][y].type != 'burned') {
+        free_tiles.push({ x: x, y: y, region: 0 });
+      }
+    }
+  }
+
+  let regions = 0;
+
+  while (true) {
+    let done = true;
+
+    for (let i = 0; i < free_tiles.length; i++) {
+      if (free_tiles[i].region == 0) {
+        regions += 1;
+        free_tiles[i].region = regions;
+
+        done = false;
+        break;
+      }
+    }
+
+    if (done) {
+      break;
+    }
+
+    let changed = 1;
+
+    while (changed > 0) {
+      changed = 0;
+
+      for (let i = 0; i < free_tiles.length; i++) {
+        if (free_tiles[i].region == 0) {
+          for (let j = 0; j < free_tiles.length; j++) {
+            if (free_tiles[j].region != 0) {
+              const distance_x = Math.abs(free_tiles[i].x - free_tiles[j].x);
+              const distance_y = Math.abs(free_tiles[i].y - free_tiles[j].y);
+
+              if (distance_x <= 1 && distance_y <= 1) {
+                free_tiles[i].region = free_tiles[j].region;
+                changed += 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    tiles: free_tiles,
+    n_regions: regions };
+}
+
+
 module.exports = {
-  validMove: validMove };
+  validMove:       validMove,
+  getBoardRegions: getBoardRegions };

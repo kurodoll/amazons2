@@ -68,10 +68,13 @@ class Amazons {
   }
 
   emitBoard(clients) {
+    const board_regions = this.game_logic.getBoardRegions(this.board.board);
+
     for (let i = 0; i < this.players.length; i++) {
       clients[this.players[i].id].socket.emit('board_update', {
         match_id: this.match_id,
         board:    this.board,
+        regions:  board_regions,
         players:  this.players,
         turn:     this.turn });
     }

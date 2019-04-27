@@ -334,8 +334,9 @@ $(() => {
         game_states[showing_match].selected = {};
       }
 
-      game_states[data.match_id].board = data.board;
-      game_states[data.match_id].turn  = data.turn;
+      game_states[data.match_id].board   = data.board;
+      game_states[data.match_id].regions = data.regions;
+      game_states[data.match_id].turn    = data.turn;
       drawBoard(data.board);
 
       // Display player info
@@ -362,6 +363,7 @@ $(() => {
       }
 
       $('#match-info-players').html(players_html);
+      $('#match-info-n_regions').text(data.regions.n_regions);
     }
   });
 
