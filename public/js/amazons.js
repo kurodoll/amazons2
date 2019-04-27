@@ -69,6 +69,7 @@ class Amazons {
 
   emitBoard(clients) {
     const board_regions = this.game_logic.getBoardRegions(this.board.board);
+    const score         = this.game_logic.getScoreSimple(this.board.board, board_regions.tiles); // eslint-disable-line max-len
 
     for (let i = 0; i < this.players.length; i++) {
       clients[this.players[i].id].socket.emit('board_update', {
@@ -76,6 +77,7 @@ class Amazons {
         board:    this.board,
         regions:  board_regions,
         players:  this.players,
+        score:    score,
         turn:     this.turn });
     }
   }

@@ -154,7 +154,65 @@ function getBoardRegions(board) {
     n_regions: regions };
 }
 
+function getScoreSimple(board, regions) {
+  const players_present = {};
+  const region_sizes    = {};
+
+  for (let i = 0; i < regions.length; i++) {
+    if (board[regions[i].x][regions[i].y].type == 'amazon') {
+      if (!players_present[regions[i].region]) {
+        players_present[regions[i].region] = [];
+      }
+
+      players_present[regions[i].region]
+          .push(board[regions[i].x][regions[i].y]);
+    }
+
+    if (region_sizes[regions[i].region]) {
+      region_sizes[regions[i].region] += 1;
+    } else {
+      region_sizes[regions[i].region] = 1;
+    }
+  }
+
+  const points           = {};
+  const points_potential = {};
+
+  for (const region in players_present) { // eslint-disable-line guard-for-in
+    const players_counted = [];
+
+    for (let i = 0; i < players_present[region].length; i++) {
+      if (players_counted.includes(players_present[region][i].owner)) {
+        continue;
+      } else {
+        players_counted.push(players_present[region][i].owner);
+      }
+
+      if (points_potential[players_present[region][i].owner]) {
+        points_potential[players_present[region][i].owner]
+          += region_sizes[region];
+      }  else {
+        points_potential[players_present[region][i].owner]
+          = region_sizes[region];
+      }
+    }
+
+    if (players_counted.length == 1) {
+      if (points[players_counted[0]]) {
+        points[players_counted[0]] += region_sizes[region];
+      } else {
+        points[players_counted[0]] = region_sizes[region];
+      }
+    }
+  }
+
+  return {
+    points:           points,
+    points_potential: points_potential };
+}
+
 
 module.exports = {
   validMove:       validMove,
-  getBoardRegions: getBoardRegions };
+  getBoardRegions: getBoardRegions,
+  getScoreSimple:  getScoreSimple };

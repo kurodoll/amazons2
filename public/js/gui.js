@@ -334,9 +334,8 @@ $(() => {
         game_states[showing_match].selected = {};
       }
 
-      game_states[data.match_id].board   = data.board;
-      game_states[data.match_id].regions = data.regions;
-      game_states[data.match_id].turn    = data.turn;
+      game_states[data.match_id].board = data.board;
+      game_states[data.match_id].turn  = data.turn;
       drawBoard(data.board);
 
       // Display player info
@@ -346,11 +345,15 @@ $(() => {
         const player_colour
           = colours.player_colours[data.players[i].internal_id].css_hex;
 
+        const cs = '<span style="color: ' +  player_colour +  ';">';
+        const ce = '</span>';
+
         players_html
-          += '<span style="color: '
-          +  player_colour
-          +  ';"><b>'
-          +  data.players[i].username
+          += cs + (data.score.points_potential[i] ? data.score.points_potential[i] : 0) + ce // eslint-disable-line max-len
+          +  '/'
+          +  cs + (data.score.points[i] ? data.score.points[i] : 0) + ce
+          +  '&emsp;'
+          +  cs + '<b>' + data.players[i].username + '</b>' + ce
           + '</b></span><span class="subdued-2">'
           +  data.players[i].id
           + '</span>';
@@ -361,7 +364,7 @@ $(() => {
 
         players_html += '<br />';
       }
-
+      console.log(data.score);
       $('#match-info-players').html(players_html);
       $('#match-info-n_regions').text(data.regions.n_regions);
     }
