@@ -1,0 +1,16 @@
+{
+    "name": "amazons2",
+    "version": "0.0.1",
+    "description": "",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "express": "^4.16.4",
+        "socket.io": "^2.2.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.16.0",
+        "eslint-config-google": "^0.12.0"
+    }
+}
