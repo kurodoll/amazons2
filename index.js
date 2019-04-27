@@ -126,6 +126,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('match_accept', (match_invite_id) => {
+    // Check whether the requester is still around
+    if (!clients[match_invites[match_invite_id].from]) {
+      return;
+    }
+
     clients[match_invites[match_invite_id].from].socket.emit(
         'invite_response',
         {
@@ -141,6 +146,11 @@ io.on('connection', (socket) => {
   });
 
   socket.on('match_decline', (match_invite_id) => {
+    // Check whether the requester is still around
+    if (!clients[match_invites[match_invite_id].from]) {
+      return;
+    }
+
     clients[match_invites[match_invite_id].from].socket.emit(
         'invite_response',
         {
