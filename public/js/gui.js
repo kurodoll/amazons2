@@ -223,10 +223,14 @@ $(() => {
   // Graphics for tiles that are valid to move to
   const graphics_valid = new PIXI.Graphics();
 
+  // Graphics for movement lines
+  const graphics_movement = new PIXI.Graphics();
+
   app.stage.addChild(graphics_tile);
   app.stage.addChild(graphics_amazon);
   app.stage.addChild(graphics_burned);
   app.stage.addChild(graphics_valid);
+  app.stage.addChild(graphics_movement);
 
 
   // ---------------------------------------------------------------- Rendering
@@ -238,12 +242,12 @@ $(() => {
     // But it works!
     graphics_tile.clear();
     graphics_tile.lineStyle(1, colours.tile_border, 1);
+    graphics_amazon.clear();
     graphics_burned.clear();
     graphics_burned.lineStyle(1, colours.burned_border, 1);
     graphics_valid.clear();
     graphics_valid.lineStyle(1, colours.valid_border, 1);
-
-    graphics_amazon.clear();
+    graphics_movement.clear();
 
     const sel_x = game_states[showing_match].selected.x;
     const sel_y = game_states[showing_match].selected.y;
@@ -313,6 +317,35 @@ $(() => {
         }
       }
     }
+
+    const lm = game_states[showing_match].last_move;
+    if (lm) {
+      for (let i = 0; i < game_states[showing_match].players.length; i++) {
+        if (lm[i] && lm[i].piece && lm[i].piece.from) {
+          graphics_movement.lineStyle(1, colours.player_colours[i].hex, .5);
+
+          graphics_movement.moveTo(
+              lm[i].piece.from.x * tile_size + (tile_size / 2),
+              lm[i].piece.from.y * tile_size + (tile_size / 2));
+
+          graphics_movement.lineTo(
+              lm[i].piece.to.x * tile_size + (tile_size / 2),
+              lm[i].piece.to.y * tile_size + (tile_size / 2));
+        }
+
+        if (lm[i] && lm[i].burn && lm[i].burn.from) {
+          graphics_movement.lineStyle(1, colours.burned_border, .5);
+
+          graphics_movement.moveTo(
+              lm[i].burn.from.x * tile_size + (tile_size / 2),
+              lm[i].burn.from.y * tile_size + (tile_size / 2));
+
+          graphics_movement.lineTo(
+              lm[i].burn.to.x * tile_size + (tile_size / 2),
+              lm[i].burn.to.y * tile_size + (tile_size / 2));
+        }
+      }
+    }
   }
 
 
@@ -361,8 +394,9 @@ $(() => {
         game_states[showing_match].selected = {};
       }
 
-      game_states[data.match_id].board = data.board;
-      game_states[data.match_id].turn  = data.turn;
+      game_states[data.match_id].board     = data.board;
+      game_states[data.match_id].turn      = data.turn;
+      game_states[data.match_id].last_move = data.last_move;
       drawBoard(data.board);
 
       // Display player info

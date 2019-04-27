@@ -8,6 +8,8 @@ class Amazons {
     this.turn = 0;
     this.piece_has_moved = false;
     this.moved_piece = { x: -1, y: -1 };
+
+    this.last_move = {};
   }
 
   begin(clients) {
@@ -40,6 +42,10 @@ class Amazons {
         // Set new position of the piece so we can check for valid burn next
         this.moved_piece = { x: to.x, y: to.y };
 
+        this.last_move[this.board.board[to.x][to.y].owner]       = {};
+        this.last_move[this.board.board[to.x][to.y].owner].piece = { from, to };
+        this.last_mover = this.board.board[to.x][to.y].owner;
+
         return true;
       }
     }
@@ -62,6 +68,10 @@ class Amazons {
           this.turn = 0;
         }
 
+        this.last_move[this.last_mover].burn = {
+          from: this.moved_piece,
+          to: tile };
+
         this.piece_has_moved = false;
         this.moved_piece = { x: -1, y: -1 };
 
@@ -83,12 +93,13 @@ class Amazons {
       }
 
       clients[this.players[i].id].socket.emit('board_update', {
-        match_id: this.match_id,
-        board:    this.board,
-        regions:  board_regions,
-        players:  this.players,
-        score:    score,
-        turn:     this.turn });
+        match_id:  this.match_id,
+        board:     this.board,
+        regions:   board_regions,
+        players:   this.players,
+        score:     score,
+        turn:      this.turn,
+        last_move: this.last_move });
     }
   }
 
