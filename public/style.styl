@@ -204,7 +204,7 @@ label
 // ========================================================================= //
 // *                                                                  Forms //
 // ========================================================================//
-input
+input, textarea
   padding       3px
   padding-left  5px
   padding-right 5px
@@ -215,8 +215,12 @@ input
   font 10px Verdana
   color clr-text
 
-input:hover
+input:hover, textarea:hover
   background clr-input-bg-hover
+
+textarea
+  width  400px
+  height 150px
 
 input[type='submit']
   cursor pointer
@@ -233,3 +237,6 @@ input.btn-large
 input.btn-large:hover
   background-color alpha(clr-text-highlight, .1)
   border 1px clr-text-highlight solid
+
+input#set-board-size
+  margin-bottom 5px

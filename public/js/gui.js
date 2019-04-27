@@ -180,7 +180,12 @@ $(() => {
   // User wants to start the match
   $('#new-match-form').submit((e) => {
     e.preventDefault();
-    socket.emit('match_start', invited_players);
+
+    socket.emit('match_start', {
+      players:      invited_players,
+      board_size:   $('#set-board-size').val(),
+      piece_config: $('#set-pieces').val() });
+
     return false;
   });
 

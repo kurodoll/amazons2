@@ -34,20 +34,6 @@ const matches       = {};
 
 
 // ========================================================================= //
-// *                                            Game State Global Variables //
-// ========================================================================//
-const default_pieces = [
-  { type: 'amazon', x: 3, y: 0, owner: 0 },
-  { type: 'amazon', x: 6, y: 0, owner: 0 },
-  { type: 'amazon', x: 0, y: 3, owner: 0 },
-  { type: 'amazon', x: 9, y: 3, owner: 0 },
-  { type: 'amazon', x: 0, y: 6, owner: 1 },
-  { type: 'amazon', x: 9, y: 6, owner: 1 },
-  { type: 'amazon', x: 6, y: 9, owner: 1 },
-  { type: 'amazon', x: 3, y: 9, owner: 1 }];
-
-
-// ========================================================================= //
 // *                                                              Socket.io //
 // ========================================================================//
 io.on('connection', (socket) => {
@@ -165,19 +151,19 @@ io.on('connection', (socket) => {
     delete match_invites[match_invite_id];
   });
 
-  socket.on('match_start', (players) => {
+  socket.on('match_start', (settings) => {
     // Make sure the match is valid
     let   n_players    = 0;
     const players_real = [];
 
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].accepted == 'accepted') {
+    for (let i = 0; i < settings.players.length; i++) {
+      if (settings.players[i].accepted == 'accepted') {
         n_players += 1;
-        players_real.push(players[i]);
+        players_real.push(settings.players[i]);
       }
     }
 
-    const pieces = default_pieces;
+    const pieces = JSON.parse(settings.piece_config);
     let   correct_players = 0;
 
     for (let i = 0; i < pieces.length; i++) {
@@ -193,7 +179,7 @@ io.on('connection', (socket) => {
     // Initialize the match data
     const match_id = genID('match');
 
-    const board = new Board(10, pieces);
+    const board = new Board(parseInt(settings.board_size), pieces);
     const game  = new Amazons(match_id, players_real, board, game_logic);
     matches[match_id] = game;
 

@@ -150,7 +150,8 @@ label {
   font: 10px Verdana;
   color: rgba(255,255,255,0.5);
 }
-input {
+input,
+textarea {
   padding: 3px;
   padding-left: 5px;
   padding-right: 5px;
@@ -159,8 +160,13 @@ input {
   font: 10px Verdana;
   color: #fff;
 }
-input:hover {
+input:hover,
+textarea:hover {
   background: rgba(0,0,0,0.5);
+}
+textarea {
+  width: 400px;
+  height: 150px;
 }
 input[type='submit'] {
   cursor: pointer;
@@ -175,4 +181,7 @@ input.btn-large {
 input.btn-large:hover {
   background-color: rgba(255,192,128,0.1);
   border: 1px #ffc080 solid;
+}
+input#set-board-size {
+  margin-bottom: 5px;
 }

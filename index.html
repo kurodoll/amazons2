@@ -68,6 +68,26 @@
           <form id='new-match-form'>
             <input class='btn-large' type='submit' value='Start Match' />
           </form>
+
+          <br />
+          <p class='heading'>Custom Settings</p>
+
+          <label>Board Size</label>
+          <input id='set-board-size' type='number' value='10'>
+
+          <label>Pieces</label>
+          <textarea id='set-pieces'>
+[
+  {"type": "amazon", "x": 3, "y": 0, "owner": 0, "selected": false},
+  {"type": "amazon", "x": 6, "y": 0, "owner": 0, "selected": false},
+  {"type": "amazon", "x": 0, "y": 3, "owner": 0, "selected": false},
+  {"type": "amazon", "x": 9, "y": 3, "owner": 0, "selected": false},
+  {"type": "amazon", "x": 0, "y": 6, "owner": 1, "selected": false},
+  {"type": "amazon", "x": 9, "y": 6, "owner": 1, "selected": false},
+  {"type": "amazon", "x": 3, "y": 9, "owner": 1, "selected": false},
+  {"type": "amazon", "x": 6, "y": 9, "owner": 1, "selected": false}
+]
+          </textarea>
         </div>
 
         <div id='match-info'>

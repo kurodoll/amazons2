@@ -13,6 +13,11 @@ class Board {
 
     // Set piece positions
     for (let i = 0; i < pieces.length; i++) {
+      if (pieces[i].x < 0 || pieces[i].y < 0 ||
+          pieces[i].x >= size || pieces[i].y >= size) {
+        continue;
+      }
+
       this.board[pieces[i].x][pieces[i].y] = pieces[i];
     }
   }
