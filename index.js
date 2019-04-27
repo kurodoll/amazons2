@@ -24,7 +24,8 @@ app.get('/', (req, res) => {
 // ========================================================================= //
 // *                                           Game Server Global Variables //
 // ========================================================================//
-const clients = {};
+const clients       = {};
+const match_invites = {};
 
 
 // ========================================================================= //
@@ -32,9 +33,15 @@ const clients = {};
 // ========================================================================//
 io.on('connection', (socket) => {
   const client = new Client(genID(), socket);
-  log('socket.io', 'A client has connected', { client_id: client.id });
-
   clients[client.id] = client;
+
+  log(
+      'socket.io',
+      'A client has connected',
+      { client_id: client.id, users_online: Object.keys(clients).length });
+
+  // Send client their ID
+  socket.emit('id', client.id);
 
   // User has chosen a username
   socket.on('set_username', (username) => {
@@ -45,10 +52,7 @@ io.on('connection', (socket) => {
       log(
           'socket.io',
           'Client has set username',
-          {
-            client_id: client.id,
-            username: username,
-            users_online: Object.keys(clients).length });
+          { client_id: client.id, username: username });
 
       // Broadcast the list of users to all clients,
       // so that everybody has a live list of all online users
@@ -76,6 +80,60 @@ io.on('connection', (socket) => {
     }
   });
 
+
+  // -------------------------------------------------------------- Match Setup
+  // User has invited a player to a match
+  socket.on('player_invite', (player_id) => {
+    if (!client.ready()) {
+      return;
+    }
+
+    const match_invite_id = genID('matchinvite');
+
+    if (clients[player_id]) {
+      clients[player_id].socket.emit('match_invite', {
+        from:     client.username,
+        match_id: match_invite_id });
+    }
+
+    match_invites[match_invite_id] = {
+      from: client.id,
+      to:   player_id };
+
+    log('socket.io', 'Match invite sent', {
+      id:   match_invite_id,
+      from: client.id,
+      to:   player_id });
+  });
+
+  socket.on('match_accept', (match_invite_id) => {
+    clients[match_invites[match_invite_id].from].socket.emit(
+        'invite_response',
+        {
+          player_id: match_invites[match_invite_id].to,
+          response: 'accepted' });
+
+    log('socket.io', 'Match invite accepted', {
+      id:   match_invite_id,
+      from: match_invites[match_invite_id].from,
+      to:   match_invites[match_invite_id].to });
+  });
+
+  socket.on('match_decline', (match_invite_id) => {
+    clients[match_invites[match_invite_id].from].socket.emit(
+        'invite_response',
+        {
+          player_id: match_invites[match_invite_id].to,
+          response: 'declined' });
+
+    log('socket.io', 'Match invite declined', {
+      id:   match_invite_id,
+      from: match_invites[match_invite_id].from,
+      to:   match_invites[match_invite_id].to });
+  });
+
+
+  // ------------------------------------------------------------------ Cleanup
   socket.on('disconnect', () => {
     delete clients[client.id];
     log('socket.io', 'A client has disconnected', { client_id: client.id });
@@ -106,8 +164,12 @@ http.listen(process.env.PORT || 3000, () => {
 // ========================================================================= //
 // *                                                       Helper Functions //
 // ========================================================================//
-function genID() {
-  return '_' + Math.random().toString(36).substr(2, 9);
+function genID(type=null) {
+  if (type) {
+    return type + '_' + Math.random().toString(36).substr(2, 9);
+  } else {
+    return '_' + Math.random().toString(36).substr(2, 9);
+  }
 }
 
 function log(caller, message, data) {

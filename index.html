@@ -19,6 +19,10 @@
         <h1>Game of the Amazons</h1>
       </div>
 
+      <div id='navbar'>
+        <p><a id='link-new-match' href='#'>New Match</a></p>
+      </div>
+
       <div id='user-cp'>
         <form id='submit-username'>
           <label>Enter a username</label>
@@ -37,13 +41,28 @@
       <div id='error-box'>
         <p id='error-message'></p>
       </div>
+      
+      <div id='notification-box'>
+        <p id='notification-message'></p>
+      </div>
     </div>
 
     <!-- Main Content -->
-    <div id='main-content' class='container'>
-      <div id='users-list-box'>
-        <p class='heading'>Online Users <span class='subdued'>(<span id='users-count'></span>)</span></p>
-        <p id='users-list'></p>
+    <div id='main-content'>
+      <div class='container'>
+        <div id='users-list-box'>
+          <p class='heading'>Online Users <span class='subdued'>(<span id='users-count'></span>)</span></p>
+          <p id='users-list'></p>
+        </div>
+
+        <div id='new-match'>
+          <h2>New Match</h2>
+
+          <p class='heading'>Invited Players</p>
+          <p id='invited-players'></p>
+          <br />
+          <p class='subdued'>(click player names on the left to invite them to your game)</p>
+        </div>
       </div>
     </div>
   </body>

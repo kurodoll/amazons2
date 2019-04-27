@@ -7,6 +7,11 @@ class Client {
   setUsername(username) {
     this.username = username;
   }
+
+  // Return whether the client has been initialized
+  ready() {
+    return (this.username != null);
+  }
 }
 
 module.exports = Client;

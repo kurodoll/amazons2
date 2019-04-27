@@ -1,9 +1,15 @@
+* {
+  box-sizing: border-box;
+}
 html {
   height: 100%;
   background: linear-gradient(#19324b, #060c18) fixed no-repeat;
 }
 div.container {
   display: flex;
+  align-items: flex-start;
+}
+div#header {
   align-items: flex-end;
 }
 div#header div:last-child {
@@ -12,8 +18,21 @@ div#header div:last-child {
 div#site-logo {
   order: 1;
 }
-div#user-cp {
+div#navbar {
   order: 2;
+  display: none;
+  margin-left: 25px;
+  margin-right: -20px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
+  border-top: 1px rgba(128,255,192,0.75) solid;
+}
+div#navbar p a {
+  font-weight: bold;
+  color: #80ffc0;
+}
+div#user-cp {
+  order: 3;
   margin-left: 25px;
   padding: 10px;
   background-color: rgba(0,0,0,0.25);
@@ -21,9 +40,20 @@ div#user-cp {
 div#user-info {
   display: none;
 }
-div#error-box {
-  order: 3;
+div#notification-box {
   display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+div#notification-box p a {
+  color: #40c0ff;
+}
+div#error-box {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 div#main-content {
   display: none;
@@ -37,12 +67,25 @@ div#users-list-box {
   width: 200px;
   background-color: rgba(0,0,0,0.25);
 }
+div#new-match {
+  order: 2;
+  display: none;
+  margin-left: 5px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
+}
 h1 {
   margin: 0;
   margin-left: 25px;
   font: 35pt Candara;
   color: #6598cc;
   text-shadow: 0 0 5px #336598;
+}
+h2 {
+  margin: 0;
+  margin-bottom: 10px;
+  font: 15pt Candara;
+  color: #80ffc0;
 }
 p {
   margin: 0;
@@ -56,15 +99,25 @@ p.heading {
   border-bottom: 1px #6598cc dashed;
 }
 p#error-message {
-  padding: 5px;
+  padding: 10px;
   background-color: rgba(255,0,0,0.25);
   color: #ff8080;
+}
+p#notification-message {
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
 }
 span#username-display {
   font-weight: bold;
 }
 .subdued {
   color: rgba(255,255,255,0.5);
+}
+.highlight {
+  color: #ffc080;
+}
+.highlight-red {
+  color: #ff8080;
 }
 a {
   text-decoration: none;
