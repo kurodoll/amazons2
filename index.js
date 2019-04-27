@@ -32,6 +32,20 @@ const matches       = {};
 
 
 // ========================================================================= //
+// *                                            Game State Global Variables //
+// ========================================================================//
+const default_pieces = [
+  { type: 'amazon', x: 3, y: 0, owner: 0 },
+  { type: 'amazon', x: 6, y: 0, owner: 0 },
+  { type: 'amazon', x: 0, y: 3, owner: 0 },
+  { type: 'amazon', x: 9, y: 3, owner: 0 },
+  { type: 'amazon', x: 0, y: 6, owner: 1 },
+  { type: 'amazon', x: 9, y: 6, owner: 1 },
+  { type: 'amazon', x: 6, y: 9, owner: 1 },
+  { type: 'amazon', x: 3, y: 9, owner: 1 }];
+
+
+// ========================================================================= //
 // *                                                              Socket.io //
 // ========================================================================//
 io.on('connection', (socket) => {
@@ -158,7 +172,7 @@ io.on('connection', (socket) => {
     // Initialize the match data
     const match_id = genID('match');
 
-    const board = new Board(10);
+    const board = new Board(10, default_pieces);
     const game  = new Amazons(match_id, players_real, board);
     matches[match_id] = game;
 

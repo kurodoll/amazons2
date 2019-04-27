@@ -190,13 +190,19 @@ $(() => {
   let showing_match;
 
   const colours = {
-    tile_border: 0x446688 };
+    tile_border: 0x446688,
+    player_colours: [
+      { hex: 0x00FF88 },
+      { hex: 0x0088FF },
+      { hex: 0xFF8800 },
+      { hex: 0xFF00000 }]};
 
   const tile_size = 50;
 
   const app = new PIXI.Application({
     width:  0,
     height: 0,
+    antialias:   true,
     transparent: true });
 
   app.renderer.autoResize = true;
@@ -221,19 +227,38 @@ $(() => {
 
   // ---------------------------------------------------------------- Rendering
   function drawBoard(board) {
+    const offset = 1;
+
     // Reset all the graphics.
     // I'm not actually sure how this works so this might be wrong...
     // But it works!
     graphics_tile.clear();
     graphics_tile.lineStyle(1, colours.tile_border, 1);
 
+    graphics_amazon.clear();
+
+    // Draw all the elements of the board
     for (let x = 0; x < board.size; x++) {
       for (let y = 0; y < board.size; y++) {
-        graphics_tile.drawRect(
-            x * tile_size + 1,
-            y * tile_size,
-            tile_size,
-            tile_size);
+        if (board.board[x][y].type != 'empty') {
+          graphics_tile.drawRect(
+              x * tile_size + offset,
+              y * tile_size + offset,
+              tile_size,
+              tile_size);
+        }
+
+        if (board.board[x][y].type == 'amazon') {
+          graphics_amazon.lineStyle(
+              2, colours.player_colours[board.board[x][y].owner].hex, 1
+          );
+
+          graphics_amazon.drawCircle(
+              (x * tile_size) + (tile_size / 2) + offset,
+              (y * tile_size) + (tile_size / 2) + offset,
+              tile_size / 3
+          );
+        }
       }
     }
   }
@@ -242,18 +267,22 @@ $(() => {
   // ======================================================================= //
   // *                                                              Amazons //
   // ======================================================================//
+  game_states = {};
+
   socket.on('match_begin', (data) => {
     console.log('Match beginning: ID is ' + data.match_id);
     showing_match = data.match_id;
 
     // Resize the canvas to fit the board
-    window_size = data.board.size * tile_size + 1;
+    window_size = data.board.size * tile_size + 2;
     app.renderer.resize(window_size, window_size);
 
     $('#game-container').show();
     $('#game').html(app.view);
 
+    // Draw the board and save the game data to memory
     drawBoard(data.board);
+    game_states[data.match_id] = { board: data.board };
 
     // Clean up the New Match stuff if present
     $('#new-match').hide();
@@ -267,7 +296,31 @@ $(() => {
   socket.on('board_update', (data) => {
     if (data.match_id == showing_match) {
       drawBoard(data.board);
+      game_states[data.match_id].board = data.board;
     }
+  });
+
+
+  // ------------------------------------------------------------- Handle Input
+  $('#game').click(function(e) {
+    // Get the mouse position
+    const element = $(this);
+    const mouse_x = e.pageX - element.offset().left;
+    const mouse_y = e.pageY - element.offset().top;
+
+    // Determine which tile was clicked, if any
+    tile_x = Math.floor((mouse_x) / tile_size);
+    tile_y = Math.floor((mouse_y) / tile_size);
+
+    const board = game_states[showing_match].board.board;
+
+    if (tile_x < 0 || tile_x >= board.size ||
+        tile_y < 0 || tile_y >= board.size) {
+      // The user didn't click on a tile
+      return;
+    }
+
+    console.log('Selected tile: ' + board[tile_x][tile_y]);
   });
 
 
