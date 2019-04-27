@@ -32,6 +32,7 @@ io.on('connection', (socket) => {
   socket.on('set_username', (username) => {
     if (username.length >= 3 && username.length <= 20) {
       client.setUsername(username);
+      socket.emit('username_set', username);
 
       log(
           'socket.io',

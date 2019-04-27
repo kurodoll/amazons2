@@ -4,7 +4,7 @@ html {
 }
 div.container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 div.container div:last-child {
   margin-left: auto;
@@ -14,8 +14,13 @@ div#site-logo {
 }
 div#user-cp {
   order: 2;
-  padding-left: 50px;
+  margin-left: 50px;
+  padding: 10px;
   vertical-align: bottom;
+  background-color: #14283c;
+}
+div#user-info {
+  display: none;
 }
 div#error-box {
   order: 3;
@@ -27,7 +32,8 @@ h1 {
   color: #6598cc;
 }
 p {
-  font: 8pt Verdana;
+  margin: 0;
+  font: 10px Verdana;
   color: #fff;
 }
 p#error-message {
@@ -35,18 +41,24 @@ p#error-message {
   background-color: rgba(255,0,0,0.25);
   color: #ff8080;
 }
+span#username-display {
+  font-weight: bold;
+}
+.subdued {
+  color: rgba(255,255,255,0.5);
+}
 label {
   display: block;
-  font: 8pt Verdana;
+  font: 10px Verdana;
   color: rgba(255,255,255,0.5);
 }
 input {
   padding: 3px;
-  padding-left: 10px;
-  padding-right: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
   background: rgba(0,0,0,0.25);
   border: none;
-  font: 8pt Verdana;
+  font: 10px Verdana;
   color: #fff;
 }
 input:hover {
