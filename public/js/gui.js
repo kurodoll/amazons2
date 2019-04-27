@@ -190,7 +190,9 @@ $(() => {
   let showing_match;
 
   const colours = {
-    tile_border: 0x446688,
+    tile_border:   0x446688,
+    burned_border: 0xFF0000,
+    burned_fill:   0xFF0000,
     player_colours: [
       { hex: 0x00FF88, css_hex: '#00FF88' },
       { hex: 0x0088FF, css_hex: '#0088FF' },
@@ -234,6 +236,8 @@ $(() => {
     // But it works!
     graphics_tile.clear();
     graphics_tile.lineStyle(1, colours.tile_border, 1);
+    graphics_burned.clear();
+    graphics_burned.lineStyle(1, colours.burned_border, 1);
 
     graphics_amazon.clear();
 
@@ -270,6 +274,17 @@ $(() => {
               game_states[showing_match].selected.y == y) {
             graphics_amazon.endFill();
           }
+        } else if (board.board[x][y].type == 'burned') {
+          graphics_burned.beginFill(colours.burned_fill, .1);
+
+          graphics_burned.drawRect(
+              (x * tile_size) + offset + 2,
+              (y * tile_size) + offset + 2,
+              tile_size - 4,
+              tile_size - 4
+          );
+
+          graphics_burned.endFill();
         }
       }
     }
@@ -287,6 +302,7 @@ $(() => {
     showing_match = data.match_id;
     game_states[data.match_id] = data;
     game_states[data.match_id].selected = {};
+    game_states[data.match_id].moved = false;
 
     // Shortcut for this user's internal_id
     for (let i = 0; i < data.players.length; i++) {
@@ -371,26 +387,36 @@ $(() => {
         return;
       }
 
-      // First check whether the user is selected a piece
-      const sel_x = game_states[showing_match].selected.x;
-      const sel_y = game_states[showing_match].selected.y;
+      // We only want to try to select/move a piece if it hasn't happened yet
+      if (!game_states[showing_match].moved) {
+        // First check whether the user is selected a piece
+        const sel_x = game_states[showing_match].selected.x;
+        const sel_y = game_states[showing_match].selected.y;
 
-      if (board.board[tile_x][tile_y].type  == 'amazon' &&
-          board.board[tile_x][tile_y].owner == game_states[showing_match].miid) { // eslint-disable-line max-len
-        if (sel_x == tile_x && sel_y == tile_y) {
-          game_states[showing_match].selected = {};
+        if (board.board[tile_x][tile_y].type  == 'amazon' &&
+            board.board[tile_x][tile_y].owner == game_states[showing_match].miid) { // eslint-disable-line max-len
+          if (sel_x == tile_x && sel_y == tile_y) {
+            game_states[showing_match].selected = {};
+          } else {
+            game_states[showing_match].selected = { x: tile_x, y: tile_y };
+          }
+
+          drawBoard(board);
         } else {
-          game_states[showing_match].selected = { x: tile_x, y: tile_y };
+          // The user may be trying to move a piece
+          if (!(sel_x === undefined || sel_y === undefined)) {
+            socket.emit('attempt_move', {
+              match_id: showing_match,
+              from: { x: sel_x,  y: sel_y },
+              to:   { x: tile_x, y: tile_y }});
+          }
         }
-
-        drawBoard(board);
       } else {
-        // The user may be trying to move a piece
-        if (!(sel_x === undefined || sel_y === undefined)) {
-          socket.emit('attempt_move', {
+        // We must be trying to burn a tile
+        if (board.board[tile_x][tile_y].type == 'tile') {
+          socket.emit('attempt_burn', {
             match_id: showing_match,
-            from: { x: sel_x,  y: sel_y },
-            to:   { x: tile_x, y: tile_y }});
+            tile: { x: tile_x, y: tile_y }});
         }
       }
 
@@ -401,6 +427,15 @@ $(() => {
 
   socket.on('move_success', (new_selected) => {
     game_states[showing_match].selected = new_selected;
+    game_states[showing_match].moved    = true;
+
+    drawBoard(game_states[showing_match].board);
+  });
+
+  socket.on('burn_success', () => {
+    game_states[showing_match].selected = {};
+    game_states[showing_match].moved    = false;
+
     drawBoard(game_states[showing_match].board);
   });
 

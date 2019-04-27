@@ -190,8 +190,8 @@ io.on('connection', (socket) => {
 
   // -------------------------------------------------------- Match Interaction
   socket.on('attempt_move', (data) => {
-    // Invalid match ID
     if (!matches[data.match_id]) {
+      // Invalid match ID
       return;
     }
 
@@ -203,6 +203,23 @@ io.on('connection', (socket) => {
         matches[data.match_id].turn == miid) {
       if (matches[data.match_id].attemptMove(data.from, data.to)) {
         socket.emit('move_success', data.to);
+        matches[data.match_id].emitBoard(clients);
+      }
+    }
+  });
+
+  socket.on('attempt_burn', (data) => {
+    if (!matches[data.match_id]) {
+      // Invalid match ID
+      return;
+    }
+
+    const miid  = matches[data.match_id].getInternalId(client.id);
+
+    // Ensure that the move is valid
+    if (matches[data.match_id].turn == miid) {
+      if (matches[data.match_id].attemptBurn(data.tile)) {
+        socket.emit('burn_success');
         matches[data.match_id].emitBoard(clients);
       }
     }
