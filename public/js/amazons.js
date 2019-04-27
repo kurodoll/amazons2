@@ -16,6 +16,17 @@ class Amazons {
     }
   }
 
+  attemptMove(from, to) {
+    if (this.board.board[from.x][from.y].type == 'amazon') {
+      this.board.board[to.x][to.y] = this.board.board[from.x][from.y];
+      this.board.board[from.x][from.y] = { type: 'tile' };
+
+      return true;
+    }
+
+    return false;
+  }
+
   emitBoard(clients) {
     for (let i = 0; i < this.players.length; i++) {
       clients[this.players[i].id].socket.emit('board_update', {
@@ -33,6 +44,16 @@ class Amazons {
         this.players[i].internal_id = internal_id;
       }
     }
+  }
+
+  getInternalId(client_id) {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].id == client_id) {
+        return this.players[i].internal_id;
+      }
+    }
+
+    return -1;
   }
 }
 

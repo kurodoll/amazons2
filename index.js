@@ -186,6 +186,26 @@ io.on('connection', (socket) => {
   });
 
 
+  // -------------------------------------------------------- Match Interaction
+  socket.on('attempt_move', (data) => {
+    // Invalid match ID
+    if (!matches[data.match_id]) {
+      return;
+    }
+
+    const board = matches[data.match_id].board.board;
+    const miid  = matches[data.match_id].getInternalId(client.id);
+
+    // Ensure that the move is valid
+    if (board[data.from.x][data.from.y].owner == miid) {
+      if (matches[data.match_id].attemptMove(data.from, data.to)) {
+        matches[data.match_id].emitBoard(clients);
+        socket.emit('move_success', data.to );
+      }
+    }
+  });
+
+
   // ------------------------------------------------------------------ Cleanup
   socket.on('disconnect', () => {
     delete clients[client.id];

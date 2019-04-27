@@ -364,20 +364,36 @@ $(() => {
       return;
     }
 
+    // First check whether the user is selected a piece
+    const sel_x = game_states[showing_match].selected.x;
+    const sel_y = game_states[showing_match].selected.y;
+
     if (board.board[tile_x][tile_y].type  == 'amazon' &&
         board.board[tile_x][tile_y].owner == game_states[showing_match].miid) {
-      if (game_states[showing_match].selected.x == tile_x &&
-          game_states[showing_match].selected.y == tile_y) {
+      if (sel_x == tile_x && sel_y == tile_y) {
         game_states[showing_match].selected = {};
       } else {
         game_states[showing_match].selected = { x: tile_x, y: tile_y };
       }
 
       drawBoard(board);
+    } else {
+      // The user may be trying to move a piece
+      if (!(sel_x === undefined || sel_y === undefined)) {
+        socket.emit('attempt_move', {
+          match_id: showing_match,
+          from: { x: sel_x,  y: sel_y },
+          to:   { x: tile_x, y: tile_y }});
+      }
     }
 
     console.log(
         'Selected tile: ' + JSON.stringify(board.board[tile_x][tile_y]));
+  });
+
+  socket.on('move_success', (new_selected) => {
+    game_states[showing_match].selected = new_selected;
+    drawBoard(game_states[showing_match].board);
   });
 
 
