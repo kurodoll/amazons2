@@ -13,7 +13,8 @@
   <script src='/js/gui.js'></script>
 
   <body>
-    <div class='container'>
+    <!-- Header -->
+    <div id='header' class='container'>
       <div id='site-logo'>
         <h1>Game of the Amazons</h1>
       </div>
@@ -35,6 +36,14 @@
 
       <div id='error-box'>
         <p id='error-message'></p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id='main-content' class='container'>
+      <div id='users-list-box'>
+        <p class='heading'>Online Users <span class='subdued'>(<span id='users-count'></span>)</span></p>
+        <p id='users-list'></p>
       </div>
     </div>
   </body>

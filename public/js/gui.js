@@ -39,6 +39,23 @@ $(() => {
     $('#submit-username').hide();
     $('#user-info').show();
     $('#username-display').text(username);
+    $('#main-content').show();
+  });
+
+  socket.on('users_list', (users) => {
+    let list_html = '';
+
+    for (let i = 0; i < users.length; i++) {
+      list_html
+        += '<a href="'
+        +  users[i].id
+        +  '">'
+        +  users[i].username
+        +  '</a><br />';
+    }
+
+    $('#users-list').html(list_html);
+    $('#users-count').text(users.length);
   });
 
   socket.on('error_message', (message) => {

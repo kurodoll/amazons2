@@ -22,11 +22,19 @@ app.get('/', (req, res) => {
 
 
 // ========================================================================= //
+// *                                           Game Server Global Variables //
+// ========================================================================//
+const clients = {};
+
+
+// ========================================================================= //
 // *                                                              Socket.io //
 // ========================================================================//
 io.on('connection', (socket) => {
   const client = new Client(genID(), socket);
   log('socket.io', 'A client has connected', { client_id: client.id });
+
+  clients[client.id] = client;
 
   // User has chosen a username
   socket.on('set_username', (username) => {
@@ -37,7 +45,25 @@ io.on('connection', (socket) => {
       log(
           'socket.io',
           'Client has set username',
-          { client_id: client.id, username: username });
+          {
+            client_id: client.id,
+            username: username,
+            users_online: Object.keys(clients).length });
+
+      // Broadcast the list of users to all clients,
+      // so that everybody has a live list of all online users
+      const users_info =
+        Object.keys(clients)
+            .filter((c) => {
+              return clients[c].username;
+            })
+            .map((c) => {
+              return {
+                id:       clients[c].id,
+                username: clients[c].username };
+            });
+
+      io.emit('users_list', users_info);
     } else {
       socket.emit(
           'error_message',
@@ -51,8 +77,23 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    delete client;
+    delete clients[client.id];
     log('socket.io', 'A client has disconnected', { client_id: client.id });
+
+    // Broadcast the list of users to all clients,
+    // so that everybody has a live list of all online users
+    const users_info =
+      Object.keys(clients)
+          .filter((c) => {
+            return clients[c].username;
+          })
+          .map((c) => {
+            return {
+              id:       clients[c].id,
+              username: clients[c].username };
+          });
+
+    io.emit('users_list', users_info);
   });
 });
 

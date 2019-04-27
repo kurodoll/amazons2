@@ -4,9 +4,9 @@ html {
 }
 div.container {
   display: flex;
-  align-items: flex-start;
+  align-items: flex-end;
 }
-div.container div:last-child {
+div#header div:last-child {
   margin-left: auto;
 }
 div#site-logo {
@@ -14,10 +14,9 @@ div#site-logo {
 }
 div#user-cp {
   order: 2;
-  margin-left: 50px;
+  margin-left: 25px;
   padding: 10px;
-  vertical-align: bottom;
-  background-color: #14283c;
+  background-color: rgba(0,0,0,0.25);
 }
 div#user-info {
   display: none;
@@ -26,15 +25,35 @@ div#error-box {
   order: 3;
   display: none;
 }
+div#main-content {
+  display: none;
+  padding-top: 10px;
+  min-height: calc(100vh - 100px);
+  background-color: rgba(0,0,0,0.25);
+}
+div#users-list-box {
+  order: 1;
+  padding: 10px;
+  width: 200px;
+  background-color: rgba(0,0,0,0.25);
+}
 h1 {
   margin: 0;
-  font: 30pt Candara;
+  margin-left: 25px;
+  font: 35pt Candara;
   color: #6598cc;
+  text-shadow: 0 0 5px #336598;
 }
 p {
   margin: 0;
   font: 10px Verdana;
   color: #fff;
+}
+p.heading {
+  margin-bottom: 3px;
+  padding-bottom: 1px;
+  font-weight: bold;
+  border-bottom: 1px #6598cc dashed;
 }
 p#error-message {
   padding: 5px;
@@ -46,6 +65,13 @@ span#username-display {
 }
 .subdued {
   color: rgba(255,255,255,0.5);
+}
+a {
+  text-decoration: none;
+  color: #8080ff;
+}
+a:hover {
+  text-decoration: underline;
 }
 label {
   display: block;

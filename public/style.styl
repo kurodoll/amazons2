@@ -3,11 +3,13 @@
 // ========================================================================//
 clr-blue-grey-1 = rgb(25, 50, 75)
 clr-blue-grey-2 = rgb( 6, 12, 24)
+clr-bg-darken   = rgba(0, 0, 0, .25)
 
 clr-text         = white
 clr-text-subdued = alpha(clr-text, .5)
 clr-error        = rgb(255, 128, 128)
 clr-error-bg     = rgba(255, 0, 0, .25)
+clr-link         = rgb(128, 128, 255);
 
 clr-input-bg       = rgba(0, 0, 0, .25)
 clr-input-bg-hover = rgba(0, 0, 0,  .5)
@@ -22,9 +24,10 @@ html
 
 div.container
   display flex
-  align-items flex-start
+  align-items flex-end
 
-div.container div:last-child
+// Header divs
+div#header div:last-child
   margin-left auto
 
 div#site-logo
@@ -33,11 +36,10 @@ div#site-logo
 div#user-cp
   order 2
 
-  margin-left 50px
+  margin-left 25px
   padding 10px
-  vertical-align bottom
 
-  background-color darken(clr-blue-grey-1, 20%)
+  background-color clr-bg-darken
 
 div#user-info
   display none
@@ -46,21 +48,48 @@ div#error-box
   order 3
   display none
 
+// Main Content divs
+div#main-content
+  display none
+
+  padding-top 10px
+  min-height calc(100vh - 100px)
+
+  background-color clr-bg-darken
+
+div#users-list-box
+  order 1
+
+  padding 10px
+  width 200px
+
+  background-color clr-bg-darken
+
 
 // ========================================================================= //
 // *                                                                   Text //
 // ========================================================================//
 h1
   margin 0
+  margin-left 25px
 
-  font 30pt Candara
+  font 35pt Candara
   color lighten(clr-blue-grey-1, 50%)
+
+  text-shadow 0 0 5px lighten(clr-blue-grey-1, 25%)
 
 p
   margin 0
 
   font 10px Verdana
   color clr-text
+
+p.heading
+  margin-bottom  3px
+  padding-bottom 1px
+
+  font-weight bold
+  border-bottom 1px lighten(clr-blue-grey-1, 50%) dashed
 
 p#error-message
   padding 5px
@@ -73,6 +102,13 @@ span#username-display
 
 .subdued
   color clr-text-subdued
+
+a
+  text-decoration none
+  color clr-link
+
+a:hover
+  text-decoration underline
 
 label
   display block
