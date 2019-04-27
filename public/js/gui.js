@@ -194,6 +194,7 @@ $(() => {
     tile_border:   0x446688,
     burned_border: 0xFF0000,
     burned_fill:   0xFF0000,
+    valid_border:  0xFFFFFF,
     player_colours: [
       { hex: 0x00FF88, css_hex: '#00FF88' },
       { hex: 0x0088FF, css_hex: '#0088FF' },
@@ -239,8 +240,13 @@ $(() => {
     graphics_tile.lineStyle(1, colours.tile_border, 1);
     graphics_burned.clear();
     graphics_burned.lineStyle(1, colours.burned_border, 1);
+    graphics_valid.clear();
+    graphics_valid.lineStyle(1, colours.valid_border, 1);
 
     graphics_amazon.clear();
+
+    const sel_x = game_states[showing_match].selected.x;
+    const sel_y = game_states[showing_match].selected.y;
 
     // Draw all the elements of the board
     for (let x = 0; x < board.size; x++) {
@@ -258,10 +264,13 @@ $(() => {
               2, colours.player_colours[board.board[x][y].owner].hex, 1
           );
 
-          if (game_states[showing_match].selected.x == x &&
-              game_states[showing_match].selected.y == y) {
+          if (sel_x == x && sel_y == y) {
             graphics_amazon.beginFill(
                 colours.player_colours[board.board[x][y].owner].hex
+            );
+          } else {
+            graphics_amazon.beginFill(
+                colours.player_colours[board.board[x][y].owner].hex, .1
             );
           }
 
@@ -271,10 +280,7 @@ $(() => {
               tile_size / 3
           );
 
-          if (game_states[showing_match].selected.x == x &&
-              game_states[showing_match].selected.y == y) {
-            graphics_amazon.endFill();
-          }
+          graphics_amazon.endFill();
         } else if (board.board[x][y].type == 'burned') {
           graphics_burned.beginFill(colours.burned_fill, .1);
 
@@ -286,6 +292,24 @@ $(() => {
           );
 
           graphics_burned.endFill();
+        } else {
+          // Draw an icon if the tile is a valid movement/action point
+          if (validMove({ x: sel_x, y: sel_y }, { x: x, y: y }, board.board)) {
+            if (game_states[showing_match].moved) {
+              graphics_valid.drawRect(
+                  (x * tile_size) + offset + 2,
+                  (y * tile_size) + offset + 2,
+                  tile_size - 4,
+                  tile_size - 4
+              );
+            } else {
+              graphics_valid.drawCircle(
+                  (x * tile_size) + (tile_size / 2) + offset,
+                  (y * tile_size) + (tile_size / 2) + offset,
+                  3
+              );
+            }
+          }
         }
       }
     }
