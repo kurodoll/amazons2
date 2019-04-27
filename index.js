@@ -176,8 +176,13 @@ io.on('connection', (socket) => {
     const game  = new Amazons(match_id, players_real, board);
     matches[match_id] = game;
 
+    // Set players
+    game.setPlayer(players_real[0].id, 0);
+    game.setPlayer(players_real[1].id, 1);
+
     log('socket.io', 'Match begun', { id: match_id });
     game.begin(clients);
+    game.emitBoard(clients);
   });
 
 

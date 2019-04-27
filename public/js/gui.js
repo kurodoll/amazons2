@@ -192,10 +192,10 @@ $(() => {
   const colours = {
     tile_border: 0x446688,
     player_colours: [
-      { hex: 0x00FF88 },
-      { hex: 0x0088FF },
-      { hex: 0xFF8800 },
-      { hex: 0xFF00000 }]};
+      { hex: 0x00FF88, css_hex: '#00FF88' },
+      { hex: 0x0088FF, css_hex: '#0088FF' },
+      { hex: 0xFF8800, css_hex: '#FF8800' },
+      { hex: 0xFF0088, css_hex: '#FF0088' }]};
 
   const tile_size = 50;
 
@@ -253,11 +253,23 @@ $(() => {
               2, colours.player_colours[board.board[x][y].owner].hex, 1
           );
 
+          if (game_states[showing_match].selected.x == x &&
+              game_states[showing_match].selected.y == y) {
+            graphics_amazon.beginFill(
+                colours.player_colours[board.board[x][y].owner].hex
+            );
+          }
+
           graphics_amazon.drawCircle(
               (x * tile_size) + (tile_size / 2) + offset,
               (y * tile_size) + (tile_size / 2) + offset,
               tile_size / 3
           );
+
+          if (game_states[showing_match].selected.x == x &&
+              game_states[showing_match].selected.y == y) {
+            graphics_amazon.endFill();
+          }
         }
       }
     }
@@ -271,7 +283,18 @@ $(() => {
 
   socket.on('match_begin', (data) => {
     console.log('Match beginning: ID is ' + data.match_id);
+
     showing_match = data.match_id;
+    game_states[data.match_id] = data;
+    game_states[data.match_id].selected = {};
+
+    // Shortcut for this user's internal_id
+    for (let i = 0; i < data.players.length; i++) {
+      if (data.players[i].id == user_id) {
+        game_states[data.match_id].miid = data.players[i].internal_id;
+        break;
+      }
+    }
 
     // Resize the canvas to fit the board
     window_size = data.board.size * tile_size + 2;
@@ -279,10 +302,6 @@ $(() => {
 
     $('#game-container').show();
     $('#game').html(app.view);
-
-    // Draw the board and save the game data to memory
-    drawBoard(data.board);
-    game_states[data.match_id] = { board: data.board };
 
     // Clean up the New Match stuff if present
     $('#new-match').hide();
@@ -295,8 +314,33 @@ $(() => {
 
   socket.on('board_update', (data) => {
     if (data.match_id == showing_match) {
-      drawBoard(data.board);
       game_states[data.match_id].board = data.board;
+      drawBoard(data.board);
+
+      // Display player info
+      let players_html = '';
+
+      for (let i = 0; i < data.players.length; i++) {
+        const player_colour
+          = colours.player_colours[data.players[i].internal_id].css_hex;
+
+        players_html
+          += '<span style="color: '
+          +  player_colour
+          +  ';"><b>'
+          +  data.players[i].username
+          + '</b></span><span class="subdued-2">'
+          +  data.players[i].id
+          + '</span>';
+
+        if (data.turn == data.players[i].internal_id) {
+          players_html += ' (current player)';
+        }
+
+        players_html += '<br />';
+      }
+
+      $('#match-info-players').html(players_html);
     }
   });
 
@@ -312,7 +356,7 @@ $(() => {
     tile_x = Math.floor((mouse_x) / tile_size);
     tile_y = Math.floor((mouse_y) / tile_size);
 
-    const board = game_states[showing_match].board.board;
+    const board = game_states[showing_match].board;
 
     if (tile_x < 0 || tile_x >= board.size ||
         tile_y < 0 || tile_y >= board.size) {
@@ -320,7 +364,20 @@ $(() => {
       return;
     }
 
-    console.log('Selected tile: ' + board[tile_x][tile_y]);
+    if (board.board[tile_x][tile_y].type  == 'amazon' &&
+        board.board[tile_x][tile_y].owner == game_states[showing_match].miid) {
+      if (game_states[showing_match].selected.x == tile_x &&
+          game_states[showing_match].selected.y == tile_y) {
+        game_states[showing_match].selected = {};
+      } else {
+        game_states[showing_match].selected = { x: tile_x, y: tile_y };
+      }
+
+      drawBoard(board);
+    }
+
+    console.log(
+        'Selected tile: ' + JSON.stringify(board.board[tile_x][tile_y]));
   });
 
 
