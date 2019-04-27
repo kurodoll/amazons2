@@ -12,6 +12,11 @@ class Amazons {
 
   begin(clients) {
     for (let i = 0; i < this.players.length; i++) {
+      // If the player has disconnected, ignore them
+      if (!clients[this.players[i]]) {
+        continue;
+      }
+
       clients[this.players[i].id].socket.emit('match_begin', {
         match_id: this.match_id,
         board:    this.board,
@@ -72,6 +77,11 @@ class Amazons {
     const score         = this.game_logic.getScoreSimple(this.board.board, board_regions.tiles); // eslint-disable-line max-len
 
     for (let i = 0; i < this.players.length; i++) {
+      // If the player has disconnected, ignore them
+      if (!clients[this.players[i]]) {
+        continue;
+      }
+
       clients[this.players[i].id].socket.emit('board_update', {
         match_id: this.match_id,
         board:    this.board,
