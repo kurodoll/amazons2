@@ -109,6 +109,21 @@ div#new-match
 
   background-color clr-bg-darken
 
+div#match-info
+  order 3
+  display none
+
+  margin-left 5px
+  padding 10px
+
+  background-color clr-bg-darken
+
+div#game-container
+  order 4
+  display none
+
+  margin-left 10px
+
 
 // ========================================================================= //
 // *                                                                   Text //
@@ -197,3 +212,16 @@ input:hover
 
 input[type='submit']
   cursor pointer
+
+input.btn-large
+  margin-top 5px
+
+  padding       5px
+  padding-left  20px
+  padding-right 20px
+
+  border 1px clr-text-subdued solid
+
+input.btn-large:hover
+  background-color alpha(clr-text-highlight, .1)
+  border 1px clr-text-highlight solid

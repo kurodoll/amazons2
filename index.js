@@ -10,7 +10,9 @@ const io = require('socket.io')(http, {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Local JavaScripts
-const Client = require(path.join(__dirname, 'public/js/client.js'));
+const Client  = require(path.join(__dirname, 'public/js/client'));
+const Board   = require(path.join(__dirname, 'public/js/board'));
+const Amazons = require(path.join(__dirname, 'public/js/amazons'));
 
 
 // ========================================================================= //
@@ -26,6 +28,7 @@ app.get('/', (req, res) => {
 // ========================================================================//
 const clients       = {};
 const match_invites = {};
+const matches       = {};
 
 
 // ========================================================================= //
@@ -118,7 +121,7 @@ io.on('connection', (socket) => {
       from: match_invites[match_invite_id].from,
       to:   match_invites[match_invite_id].to });
 
-    delete match_invies[match_invite_id];
+    delete match_invites[match_invite_id];
   });
 
   socket.on('match_decline', (match_invite_id) => {
@@ -133,7 +136,34 @@ io.on('connection', (socket) => {
       from: match_invites[match_invite_id].from,
       to:   match_invites[match_invite_id].to });
 
-    delete match_invies[match_invite_id];
+    delete match_invites[match_invite_id];
+  });
+
+  socket.on('match_start', (players) => {
+    // Make sure the match is valid
+    let   n_players    = 0;
+    const players_real = [];
+
+    for (let i = 0; i < players.length; i++) {
+      if (players[i].accepted == 'accepted') {
+        n_players += 1;
+        players_real.push(players[i]);
+      }
+    }
+
+    if (n_players != 2) {
+      return;
+    }
+
+    // Initialize the match data
+    const match_id = genID('match');
+
+    const board = new Board(10);
+    const game  = new Amazons(match_id, players_real, board);
+    matches[match_id] = game;
+
+    log('socket.io', 'Match begun', { id: match_id });
+    game.begin(clients);
   });
 
 

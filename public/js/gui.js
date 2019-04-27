@@ -176,6 +176,100 @@ $(() => {
     updateInvitedPlayers();
   });
 
+  // User wants to start the match
+  $('#new-match-form').submit((e) => {
+    e.preventDefault();
+    socket.emit('match_start', invited_players);
+    return false;
+  });
+
+
+  // ======================================================================= //
+  // *                                                               PixiJS //
+  // ======================================================================//
+  let showing_match;
+
+  const colours = {
+    tile_border: 0x446688 };
+
+  const tile_size = 50;
+
+  const app = new PIXI.Application({
+    width:  0,
+    height: 0,
+    transparent: true });
+
+  app.renderer.autoResize = true;
+
+  // Graphics for the board itself
+  const graphics_tile = new PIXI.Graphics();
+
+  // Graphics for the Amazon pieces
+  const graphics_amazon = new PIXI.Graphics();
+
+  // Graphics for "burned" tiles
+  const graphics_burned = new PIXI.Graphics();
+
+  // Graphics for tiles that are valid to move to
+  const graphics_valid = new PIXI.Graphics();
+
+  app.stage.addChild(graphics_tile);
+  app.stage.addChild(graphics_amazon);
+  app.stage.addChild(graphics_burned);
+  app.stage.addChild(graphics_valid);
+
+
+  // ---------------------------------------------------------------- Rendering
+  function drawBoard(board) {
+    // Reset all the graphics.
+    // I'm not actually sure how this works so this might be wrong...
+    // But it works!
+    graphics_tile.clear();
+    graphics_tile.lineStyle(1, colours.tile_border, 1);
+
+    for (let x = 0; x < board.size; x++) {
+      for (let y = 0; y < board.size; y++) {
+        graphics_tile.drawRect(
+            x * tile_size + 1,
+            y * tile_size,
+            tile_size,
+            tile_size);
+      }
+    }
+  }
+
+
+  // ======================================================================= //
+  // *                                                              Amazons //
+  // ======================================================================//
+  socket.on('match_begin', (data) => {
+    console.log('Match beginning: ID is ' + data.match_id);
+    showing_match = data.match_id;
+
+    // Resize the canvas to fit the board
+    window_size = data.board.size * tile_size + 1;
+    app.renderer.resize(window_size, window_size);
+
+    $('#game-container').show();
+    $('#game').html(app.view);
+
+    drawBoard(data.board);
+
+    // Clean up the New Match stuff if present
+    $('#new-match').hide();
+    setting_up_match = false;
+
+    // Show the Match Info box
+    $('#match-info').show();
+    $('#match-info-id').text(data.match_id);
+  });
+
+  socket.on('board_update', (data) => {
+    if (data.match_id == showing_match) {
+      drawBoard(data.board);
+    }
+  });
+
 
   // ======================================================================= //
   // *                                                     Helper Functions //
