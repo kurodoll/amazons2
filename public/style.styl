@@ -4,6 +4,12 @@
 clr-blue-grey-1 = rgb(25, 50, 75)
 clr-blue-grey-2 = rgb( 6, 12, 24)
 
+clr-text         = white
+clr-text-subdued = alpha(clr-text, .5)
+
+clr-input-bg       = rgba(0, 0, 0, .25)
+clr-input-bg-hover = rgba(0, 0, 0,  .5)
+
 
 // ========================================================================= //
 // *                                                                General //
@@ -11,3 +17,53 @@ clr-blue-grey-2 = rgb( 6, 12, 24)
 html
   height 100%
   background linear-gradient(clr-blue-grey-1, clr-blue-grey-2) fixed no-repeat
+
+div.container
+  display flex
+  align-items center
+
+div#site-logo
+  order 1
+
+div#user-cp
+  order 2
+
+  padding-left 50px
+  vertical-align bottom
+
+
+// ========================================================================= //
+// *                                                                   Text //
+// ========================================================================//
+h1
+  margin 0
+
+  font 30pt Candara
+  color lighten(clr-blue-grey-1, 50%)
+
+label
+  display block
+
+  font 10pt Candara
+  color clr-text-subdued
+
+
+// ========================================================================= //
+// *                                                                  Forms //
+// ========================================================================//
+input
+  padding        3px
+  padding-left  10px
+  padding-right 10px
+
+  background clr-input-bg
+  border none
+
+  font 10pt Candara
+  color clr-text
+
+input:hover
+  background clr-input-bg-hover
+
+input[type='submit']
+  cursor pointer

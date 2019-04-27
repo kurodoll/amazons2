@@ -2,3 +2,40 @@ html {
   height: 100%;
   background: linear-gradient(#19324b, #060c18) fixed no-repeat;
 }
+div.container {
+  display: flex;
+  align-items: center;
+}
+div#site-logo {
+  order: 1;
+}
+div#user-cp {
+  order: 2;
+  padding-left: 50px;
+  vertical-align: bottom;
+}
+h1 {
+  margin: 0;
+  font: 30pt Candara;
+  color: #6598cc;
+}
+label {
+  display: block;
+  font: 10pt Candara;
+  color: rgba(255,255,255,0.5);
+}
+input {
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  background: rgba(0,0,0,0.25);
+  border: none;
+  font: 10pt Candara;
+  color: #fff;
+}
+input:hover {
+  background: rgba(0,0,0,0.5);
+}
+input[type='submit'] {
+  cursor: pointer;
+}

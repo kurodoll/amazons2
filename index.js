@@ -25,10 +25,22 @@ app.get('/', (req, res) => {
 // *                                                              Socket.io //
 // ========================================================================//
 io.on('connection', (socket) => {
-  const client = new Client(socket);
+  const client = new Client(genID(), socket);
+  log('socket.io', 'A client has connected', { client_id: client.id });
+
+  // User has chosen a username
+  socket.on('set_username', (username) => {
+    client.setUsername(username);
+
+    log(
+        'socket.io',
+        'Client has set username',
+        { client_id: client.id, username: username });
+  });
 
   socket.on('disconnect', () => {
     delete client;
+    log('socket.io', 'A client has disconnected', { client_id: client.id });
   });
 });
 
@@ -36,3 +48,19 @@ io.on('connection', (socket) => {
 http.listen(process.env.PORT || 3000, () => {
   console.log('listening on *:' + (process.env.PORT || 3000));
 });
+
+
+// ========================================================================= //
+// *                                                       Helper Functions //
+// ========================================================================//
+function genID() {
+  return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function log(caller, message, data) {
+  const time     = new Date();
+  const time_str = time.toLocaleString();
+
+  process.stdout.write(time_str + ' [' + caller + '] ' + message + ' ');
+  console.dir(data);
+}
