@@ -199,10 +199,11 @@ io.on('connection', (socket) => {
     const miid  = matches[data.match_id].getInternalId(client.id);
 
     // Ensure that the move is valid
-    if (board[data.from.x][data.from.y].owner == miid) {
+    if (board[data.from.x][data.from.y].owner == miid &&
+        matches[data.match_id].turn == miid) {
       if (matches[data.match_id].attemptMove(data.from, data.to)) {
+        socket.emit('move_success', data.to);
         matches[data.match_id].emitBoard(clients);
-        socket.emit('move_success', data.to );
       }
     }
   });

@@ -23,6 +23,11 @@ class Amazons {
         this.board.board[to.x][to.y] = this.board.board[from.x][from.y];
         this.board.board[from.x][from.y] = { type: 'tile' };
 
+        this.turn += 1;
+        if (this.turn == this.players.length) {
+          this.turn = 0;
+        }
+
         return true;
       }
     }

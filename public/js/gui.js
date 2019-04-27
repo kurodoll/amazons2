@@ -314,7 +314,12 @@ $(() => {
 
   socket.on('board_update', (data) => {
     if (data.match_id == showing_match) {
+      if (data.turn != game_states[showing_match].miid) {
+        game_states[showing_match].selected = {};
+      }
+
       game_states[data.match_id].board = data.board;
+      game_states[data.match_id].turn  = data.turn;
       drawBoard(data.board);
 
       // Display player info
@@ -347,48 +352,51 @@ $(() => {
 
   // ------------------------------------------------------------- Handle Input
   $('#game').click(function(e) {
-    // Get the mouse position
-    const element = $(this);
-    const mouse_x = e.pageX - element.offset().left;
-    const mouse_y = e.pageY - element.offset().top;
+    // Only allow clicks if it's the user's turn
+    if (game_states[showing_match].turn == game_states[showing_match].miid) {
+      // Get the mouse position
+      const element = $(this);
+      const mouse_x = e.pageX - element.offset().left;
+      const mouse_y = e.pageY - element.offset().top;
 
-    // Determine which tile was clicked, if any
-    tile_x = Math.floor((mouse_x) / tile_size);
-    tile_y = Math.floor((mouse_y) / tile_size);
+      // Determine which tile was clicked, if any
+      tile_x = Math.floor((mouse_x) / tile_size);
+      tile_y = Math.floor((mouse_y) / tile_size);
 
-    const board = game_states[showing_match].board;
+      const board = game_states[showing_match].board;
 
-    if (tile_x < 0 || tile_x >= board.size ||
-        tile_y < 0 || tile_y >= board.size) {
-      // The user didn't click on a tile
-      return;
-    }
+      if (tile_x < 0 || tile_x >= board.size ||
+          tile_y < 0 || tile_y >= board.size) {
+        // The user didn't click on a tile
+        return;
+      }
 
-    // First check whether the user is selected a piece
-    const sel_x = game_states[showing_match].selected.x;
-    const sel_y = game_states[showing_match].selected.y;
+      // First check whether the user is selected a piece
+      const sel_x = game_states[showing_match].selected.x;
+      const sel_y = game_states[showing_match].selected.y;
 
-    if (board.board[tile_x][tile_y].type  == 'amazon' &&
-        board.board[tile_x][tile_y].owner == game_states[showing_match].miid) {
-      if (sel_x == tile_x && sel_y == tile_y) {
-        game_states[showing_match].selected = {};
+      if (board.board[tile_x][tile_y].type  == 'amazon' &&
+          board.board[tile_x][tile_y].owner == game_states[showing_match].miid) { // eslint-disable-line max-len
+        if (sel_x == tile_x && sel_y == tile_y) {
+          game_states[showing_match].selected = {};
+        } else {
+          game_states[showing_match].selected = { x: tile_x, y: tile_y };
+        }
+
+        drawBoard(board);
       } else {
-        game_states[showing_match].selected = { x: tile_x, y: tile_y };
+        // The user may be trying to move a piece
+        if (!(sel_x === undefined || sel_y === undefined)) {
+          socket.emit('attempt_move', {
+            match_id: showing_match,
+            from: { x: sel_x,  y: sel_y },
+            to:   { x: tile_x, y: tile_y }});
+        }
       }
 
-      drawBoard(board);
-    } else {
-      // The user may be trying to move a piece
-      if (!(sel_x === undefined || sel_y === undefined)) {
-        socket.emit('attempt_move', {
-          match_id: showing_match,
-          from: { x: sel_x,  y: sel_y },
-          to:   { x: tile_x, y: tile_y }});
-      }
+      console.log(
+          'Selected tile: ' + JSON.stringify(board.board[tile_x][tile_y]));
     }
-
-    console.log(
-        'Selected tile: ' + JSON.stringify(board.board[tile_x][tile_y]));
   });
 
   socket.on('move_success', (new_selected) => {
