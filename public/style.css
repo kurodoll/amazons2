@@ -135,6 +135,9 @@ span#username-display {
 .highlight-red {
   color: #ff8080;
 }
+.highlight-green {
+  color: #80ffc0;
+}
 a {
   text-decoration: none;
   color: #8080ff;

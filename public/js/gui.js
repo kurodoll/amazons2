@@ -471,6 +471,8 @@ $(() => {
         players_html += ' (<span class="highlight">pending</span>)';
       } else if (invited_players[i].accepted == 'declined') {
         players_html += ' (<span class="highlight-red">declined</span>)';
+      } else if (invited_players[i].accepted == 'accepted') {
+        players_html += ' (<span class="highlight-green">accepted</span>)';
       }
 
       players_html += '<br />';
