@@ -14,6 +14,8 @@ const Client  = require(path.join(__dirname, 'public/js/client'));
 const Board   = require(path.join(__dirname, 'public/js/board'));
 const Amazons = require(path.join(__dirname, 'public/js/amazons'));
 
+const game_logic = require(path.join(__dirname, 'public/js/game_logic'));
+
 
 // ========================================================================= //
 // *                                                                Routing //
@@ -173,7 +175,7 @@ io.on('connection', (socket) => {
     const match_id = genID('match');
 
     const board = new Board(10, default_pieces);
-    const game  = new Amazons(match_id, players_real, board);
+    const game  = new Amazons(match_id, players_real, board, game_logic);
     matches[match_id] = game;
 
     // Set players

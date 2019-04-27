@@ -1,8 +1,9 @@
 class Amazons {
-  constructor(match_id, players, board) {
-    this.match_id = match_id;
-    this.players  = players;
-    this.board    = board;
+  constructor(match_id, players, board, game_logic) {
+    this.match_id   = match_id;
+    this.players    = players;
+    this.board      = board;
+    this.game_logic = game_logic;
 
     this.turn = 0;
   }
@@ -18,10 +19,12 @@ class Amazons {
 
   attemptMove(from, to) {
     if (this.board.board[from.x][from.y].type == 'amazon') {
-      this.board.board[to.x][to.y] = this.board.board[from.x][from.y];
-      this.board.board[from.x][from.y] = { type: 'tile' };
+      if (this.game_logic.validMove(from, to, this.board.board)) {
+        this.board.board[to.x][to.y] = this.board.board[from.x][from.y];
+        this.board.board[from.x][from.y] = { type: 'tile' };
 
-      return true;
+        return true;
+      }
     }
 
     return false;
