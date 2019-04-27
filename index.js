@@ -167,20 +167,31 @@ io.on('connection', (socket) => {
       }
     }
 
-    if (n_players != 2) {
+    const pieces = default_pieces;
+    let   correct_players = 0;
+
+    for (let i = 0; i < pieces.length; i++) {
+      if (pieces[i].owner > correct_players) {
+        correct_players = pieces[i].owner + 1;
+      }
+    }
+
+    if (n_players != correct_players) {
       return;
     }
 
     // Initialize the match data
     const match_id = genID('match');
 
-    const board = new Board(10, default_pieces);
+    const board = new Board(10, pieces);
     const game  = new Amazons(match_id, players_real, board, game_logic);
     matches[match_id] = game;
 
     // Set players
-    game.setPlayer(players_real[0].id, 0);
-    game.setPlayer(players_real[1].id, 1);
+    for (let i = 0; i < n_players; i++) {
+      game.setPlayer(players_real[i].id, i);
+      game.setPlayer(players_real[i].id, i);
+    }
 
     log('socket.io', 'Match begun', { id: match_id });
     game.begin(clients);
