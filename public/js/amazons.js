@@ -13,7 +13,7 @@ class Amazons {
   begin(clients) {
     for (let i = 0; i < this.players.length; i++) {
       // If the player has disconnected, ignore them
-      if (!clients[this.players[i]]) {
+      if (!clients[this.players[i].id]) {
         continue;
       }
 
@@ -78,7 +78,7 @@ class Amazons {
 
     for (let i = 0; i < this.players.length; i++) {
       // If the player has disconnected, ignore them
-      if (!clients[this.players[i]]) {
+      if (!clients[this.players[i].id]) {
         continue;
       }
 
