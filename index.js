@@ -117,6 +117,8 @@ io.on('connection', (socket) => {
       id:   match_invite_id,
       from: match_invites[match_invite_id].from,
       to:   match_invites[match_invite_id].to });
+
+    delete match_invies[match_invite_id];
   });
 
   socket.on('match_decline', (match_invite_id) => {
@@ -130,6 +132,8 @@ io.on('connection', (socket) => {
       id:   match_invite_id,
       from: match_invites[match_invite_id].from,
       to:   match_invites[match_invite_id].to });
+
+    delete match_invies[match_invite_id];
   });
 
 
