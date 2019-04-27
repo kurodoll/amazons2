@@ -131,7 +131,7 @@ $(() => {
     notification_id += 1;
 
     const notification
-      = info.from + ' has invited you to a match: '
+      = '<b>' + info.from + '</b> has invited you to a match: '
       + '<a id="' + this_notification_id + '" href="#">Accept</a> or '
       + '<a id="' + this_notification_id + '" href="#">Decline</a>';
 
@@ -142,6 +142,7 @@ $(() => {
       active:          true });
 
     updateNotifications();
+    $('#sound-request-received')[0].play();
   });
 
   $('#notification-box').on('click', 'a', (e) => {
@@ -326,6 +327,8 @@ $(() => {
     // Show the Match Info box
     $('#match-info').show();
     $('#match-info-id').text(data.match_id);
+
+    $('#sound-match-start')[0].play();
   });
 
   socket.on('board_update', (data) => {
@@ -364,7 +367,7 @@ $(() => {
 
         players_html += '<br />';
       }
-      console.log(data.score);
+
       $('#match-info-players').html(players_html);
       $('#match-info-n_regions').text(data.regions.n_regions);
     }
@@ -435,6 +438,7 @@ $(() => {
     game_states[showing_match].moved    = true;
 
     drawBoard(game_states[showing_match].board);
+    $('#sound-piece-move')[0].play();
   });
 
   socket.on('burn_success', () => {
@@ -442,6 +446,7 @@ $(() => {
     game_states[showing_match].moved    = false;
 
     drawBoard(game_states[showing_match].board);
+    $('#sound-burn')[0].play();
   });
 
 
