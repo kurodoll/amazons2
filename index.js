@@ -30,12 +30,23 @@ io.on('connection', (socket) => {
 
   // User has chosen a username
   socket.on('set_username', (username) => {
-    client.setUsername(username);
+    if (username.length >= 3 && username.length <= 20) {
+      client.setUsername(username);
 
-    log(
-        'socket.io',
-        'Client has set username',
-        { client_id: client.id, username: username });
+      log(
+          'socket.io',
+          'Client has set username',
+          { client_id: client.id, username: username });
+    } else {
+      socket.emit(
+          'error_message',
+          'Username must be 3 to 20 characters long (inclusive)');
+
+      log(
+          'socket.io',
+          'Client has attempted to set an invalid username',
+          { client_id: client.id, username: username });
+    }
   });
 
   socket.on('disconnect', () => {

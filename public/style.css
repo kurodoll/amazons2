@@ -6,6 +6,9 @@ div.container {
   display: flex;
   align-items: center;
 }
+div.container div:last-child {
+  margin-left: auto;
+}
 div#site-logo {
   order: 1;
 }
@@ -14,14 +17,27 @@ div#user-cp {
   padding-left: 50px;
   vertical-align: bottom;
 }
+div#error-box {
+  order: 3;
+  display: none;
+}
 h1 {
   margin: 0;
   font: 30pt Candara;
   color: #6598cc;
 }
+p {
+  font: 8pt Verdana;
+  color: #fff;
+}
+p#error-message {
+  padding: 5px;
+  background-color: rgba(255,0,0,0.25);
+  color: #ff8080;
+}
 label {
   display: block;
-  font: 10pt Candara;
+  font: 8pt Verdana;
   color: rgba(255,255,255,0.5);
 }
 input {
@@ -30,7 +46,7 @@ input {
   padding-right: 10px;
   background: rgba(0,0,0,0.25);
   border: none;
-  font: 10pt Candara;
+  font: 8pt Verdana;
   color: #fff;
 }
 input:hover {

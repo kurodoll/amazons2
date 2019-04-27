@@ -6,6 +6,8 @@ clr-blue-grey-2 = rgb( 6, 12, 24)
 
 clr-text         = white
 clr-text-subdued = alpha(clr-text, .5)
+clr-error        = rgb(255, 128, 128)
+clr-error-bg     = rgba(255, 0, 0, .25)
 
 clr-input-bg       = rgba(0, 0, 0, .25)
 clr-input-bg-hover = rgba(0, 0, 0,  .5)
@@ -22,6 +24,9 @@ div.container
   display flex
   align-items center
 
+div.container div:last-child
+  margin-left auto
+
 div#site-logo
   order 1
 
@@ -30,6 +35,10 @@ div#user-cp
 
   padding-left 50px
   vertical-align bottom
+
+div#error-box
+  order 3
+  display none
 
 
 // ========================================================================= //
@@ -41,10 +50,20 @@ h1
   font 30pt Candara
   color lighten(clr-blue-grey-1, 50%)
 
+p
+  font 8pt Verdana
+  color clr-text
+
+p#error-message
+  padding 5px
+
+  background-color clr-error-bg
+  color            clr-error
+
 label
   display block
 
-  font 10pt Candara
+  font 8pt Verdana
   color clr-text-subdued
 
 
@@ -59,7 +78,7 @@ input
   background clr-input-bg
   border none
 
-  font 10pt Candara
+  font 8pt Verdana
   color clr-text
 
 input:hover
