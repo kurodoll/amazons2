@@ -174,11 +174,11 @@ io.on('connection', (socket) => {
 
     for (let i = 0; i < pieces.length; i++) {
       if (pieces[i].owner > correct_players) {
-        correct_players = pieces[i].owner + 1;
+        correct_players = pieces[i].owner;
       }
     }
 
-    if (n_players != correct_players) {
+    if (n_players != correct_players + 1) {
       return;
     }
 
