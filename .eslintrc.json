@@ -9,6 +9,7 @@
         "object-curly-spacing": "off",
         "no-multi-spaces": "off",
         "camelcase": "off",
-        "key-spacing": "off"
+        "key-spacing": "off",
+        "array-bracket-spacing": "off"
     }
 }

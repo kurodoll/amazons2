@@ -29,6 +29,7 @@ $(() => {
   // Receive our ID
   socket.on('id', (id) => {
     user_id = id;
+    $('#user-id-display').text(user_id);
   });
 
 
@@ -42,6 +43,7 @@ $(() => {
     socket.emit('set_username', $('#input-username').val());
 
     $('#error-box').hide();
+    $('#logging-in-message').show();
 
     return false;
   });
@@ -49,10 +51,13 @@ $(() => {
   // Server accepted our chosen username
   socket.on('username_set', (username) => {
     user_username = username;
+  });
 
+  socket.on('logged_in', () => {
+    $('#logging-in-message').hide();
     $('#submit-username').hide();
     $('#user-info').show();
-    $('#username-display').text(username);
+    $('#username-display').text(user_username);
     $('#navbar').show();
     $('#main-content').show();
   });

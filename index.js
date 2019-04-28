@@ -17,6 +17,52 @@ const Board   = require(path.join(__dirname, 'public/js/board'));
 const Amazons = require(path.join(__dirname, 'public/js/amazons'));
 const AI      = new (require(path.join(__dirname, 'public/js/ai')))(game_logic);
 
+let config;
+try {
+  config = require(path.join(__dirname, 'config'));
+} catch (e) {
+  console.warn('No config file found.');
+}
+
+
+// ========================================================================= //
+// *                                                                DB Init //
+// ========================================================================//
+const pg  = require('pg');
+const url = require('url');
+
+let db_url;
+let pg_pool;
+
+if (process.env.DATABASE_URL) {
+  db_url = process.env.DATABASE_URL;
+} else {
+  db_url = config.db.url;
+}
+
+if (db_url) {
+  const params = url.parse(db_url);
+  const auth = params.auth.split(':');
+
+  const pg_config = {
+    host: params.hostname,
+    port: params.port,
+    user: auth[0],
+    password: auth[1],
+    database: params.pathname.split('/')[1],
+    ssl: true,
+    max: 10,
+    idleTimeoutMillis: 30000 };
+
+  pg_pool = new pg.Pool(pg_config);
+} else {
+  console.error('Couldn\'t connect to database as no config could be loaded.');
+}
+
+pg_pool.on('error', function(err, client) {
+  console.error('Idle client error: ', err.message, err.stack);
+});
+
 
 // ========================================================================= //
 // *                                                                Routing //
@@ -52,6 +98,36 @@ io.on('connection', (socket) => {
   // User has chosen a username
   socket.on('set_username', (username) => {
     if (username.length >= 3 && username.length <= 20) {
+      // Save username to DB or get saved ID
+      let query = 'SELECT * FROM users WHERE username = $1;';
+      let vars  = [ username ];
+
+      pg_pool.query(query, vars, (err, result) => {
+        if (err) {
+          console.error(err);
+          socket.emit('logged_in');
+        } else if (result.rows.length == 0) {
+          query = 'INSERT INTO users (username, user_id) VALUES ($1, $2);';
+          vars  = [ username, client.id ];
+
+          pg_pool.query(query, vars, (err2, result2) => {
+            if (err2) {
+              console.error(err2);
+            }
+
+            socket.emit('logged_in');
+          });
+        } else {
+          const old_id = client.id;
+          client.changeID(result.rows[0].user_id);
+          clients[client.id] = client;
+          delete clients[old_id];
+
+          socket.emit('id', client.id);
+          socket.emit('logged_in');
+        }
+      });
+
       client.setUsername(username);
       socket.emit('username_set', username);
 
