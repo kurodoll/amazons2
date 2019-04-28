@@ -531,11 +531,13 @@ $(() => {
 
     for (let i = 0; i < notification_list.length; i++) {
       if (notification_list[i].active) {
-        notifications_html += notification_list[i].text + '<br />';
+        notifications_html
+          += '<p class="notification-message">'
+          +  notification_list[i].text + '</p>';
       }
     }
 
-    $('#notification-message').html(notifications_html);
+    $('#notification-box').html(notifications_html);
 
     if (notifications_html) {
       $('#notification-box').show();

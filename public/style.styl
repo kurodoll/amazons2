@@ -75,6 +75,12 @@ div#notification-box
   top   10px
   right 10px
 
+  background-color clr-blue-grey-2
+  border 1px lighten(clr-blue-grey-1, 20%) solid
+
+div#notification-box p:nth-child(even)
+  background-color lighten(clr-blue-grey-2, 5%)
+
 div#notification-box p a
   color clr-link-3
 
@@ -165,9 +171,8 @@ p#error-message
   background-color clr-error-bg
   color            clr-error
 
-p#notification-message
+p.notification-message
   padding 10px
-  background-color clr-bg-darken
 
 span#username-display
   font-weight bold
