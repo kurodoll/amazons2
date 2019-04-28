@@ -15,6 +15,7 @@ class Amazons {
     this.last_move = {};
 
     this.match_started = new Date().getTime();
+    this.match_ended   = null;
 
     this.timer = setInterval(() => {
       if (this.turn_timer && (new Date().getTime() > this.turn_ends)) {
@@ -189,6 +190,7 @@ class Amazons {
       for (let i = 0; i < this.players.length; i++) {
         if (this.losers.indexOf(this.players[i].internal_id) == -1) {
           this.winner = this.players[i];
+          this.match_ended = new Date().getTime();
         }
       }
     }
@@ -234,7 +236,8 @@ class Amazons {
         server_time: new Date().getTime(),
         history:     JSON.stringify(this.turn_history),
         losers:      this.losers,
-        winner:      this.winner });
+        winner:      this.winner,
+        match_ended: this.match_ended });
     }
 
     this.clients = clients;

@@ -437,11 +437,12 @@ $(() => {
         game_states[showing_match].selected = {};
       }
 
-      game_states[data.match_id].board     = data.board;
-      game_states[data.match_id].turn      = data.turn;
-      game_states[data.match_id].turn_ends = data.turn_ends;
-      game_states[data.match_id].last_move = data.last_move;
-      game_states[data.match_id].winner    = data.winner;
+      game_states[data.match_id].board       = data.board;
+      game_states[data.match_id].turn        = data.turn;
+      game_states[data.match_id].turn_ends   = data.turn_ends;
+      game_states[data.match_id].last_move   = data.last_move;
+      game_states[data.match_id].winner      = data.winner;
+      game_states[data.match_id].match_ended = data.match_ended;
       drawBoard(data.board);
 
       game_states[data.match_id].time_offset =
@@ -534,7 +535,11 @@ $(() => {
   function turn_timer() {
     // Update match time
     if (game_states[showing_match]) {
-      const seconds           = Math.floor((new Date().getTime() + game_states[showing_match].time_offset - game_states[showing_match].match_started) / 1000); // eslint-disable-line max-len
+      const end_time = game_states[showing_match].match_ended ?
+        game_states[showing_match].match_ended :
+        new Date().getTime() + game_states[showing_match].time_offset;
+
+      const seconds           = Math.floor((end_time - game_states[showing_match].match_started) / 1000); // eslint-disable-line max-len
       const minutes           = Math.floor(seconds / 60);
       const seconds_of_minute = seconds % 60;
 
