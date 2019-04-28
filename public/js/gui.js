@@ -441,9 +441,8 @@ $(() => {
         const ce = '</span>';
 
         players_html
-          += cs + (data.score.points_potential[i] ? data.score.points_potential[i] : 0) + ce // eslint-disable-line max-len
-          +  '/'
-          +  cs + (data.score.points[i] ? data.score.points[i] : 0) + ce
+          += cs + '<b>' + (data.score.points[i] ? data.score.points[i] : 0) + '</b>' + ce                                    // eslint-disable-line max-len
+          +  '/<span class="subdued-2">' + (data.score.points_potential[i] ? data.score.points_potential[i] : 0) + '</span>' // eslint-disable-line max-len
           +  '&emsp;'
           +  cs + '<b>' + data.players[i].username + '</b>' + ce
           + '</b></span><span class="subdued-2">'
