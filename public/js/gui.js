@@ -467,6 +467,13 @@ $(() => {
 
         if (!game_states[showing_match].turn == game_states[showing_match].miid) { // eslint-disable-line max-len
           text = '<span class="subdued">' + text + '</span>';
+        } else {
+          text
+            = '<span style="color: '
+            + colours.player_colours[game_states[showing_match].miid].css_hex
+            + '";>'
+            + text
+            + '</span>';
         }
 
         $('#turn-timer').html(text);
