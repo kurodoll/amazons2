@@ -511,7 +511,7 @@ $(() => {
 
 
   // ------------------------------------------------------------- Handle Input
-  $('#game').click(function(e) {
+  $('#game').on('click tap', function(e) {
     // Only allow clicks if it's the user's turn
     if (game_states[showing_match].turn == game_states[showing_match].miid) {
       // Get the mouse position
