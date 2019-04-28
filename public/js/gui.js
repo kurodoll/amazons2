@@ -421,6 +421,10 @@ $(() => {
       game_states[data.match_id].last_move = data.last_move;
       drawBoard(data.board);
 
+      game_states[data.match_id].time_offset =
+        data.server_time - new Date().getTime();
+      console.log('Server time offset is ' + game_states[data.match_id].time_offset); // eslint-disable-line max-len
+
       // This is to reset the local move data if a player's turn time runs out
       if (data.turn != game_states[showing_match].miid) {
         game_states[showing_match].moved = false;
@@ -467,7 +471,7 @@ $(() => {
 
       // Update turn timer
       if (game_states[showing_match].turn_ends) {
-        let text = ((game_states[showing_match].turn_ends - new Date().getTime()) / 1000).toFixed(1); // eslint-disable-line max-len
+        let text = ((game_states[showing_match].turn_ends - new Date().getTime() + game_states[showing_match].time_offset) / 1000).toFixed(1); // eslint-disable-line max-len
 
         if (!(game_states[showing_match].turn == game_states[showing_match].miid)) { // eslint-disable-line max-len
           text = '<span class="subdued">' + text + '</span>';

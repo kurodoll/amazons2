@@ -116,14 +116,15 @@ class Amazons {
       }
 
       clients[this.players[i].id].socket.emit('board_update', {
-        match_id:  this.match_id,
-        players:   this.players,
-        board:     this.board,
-        regions:   board_regions,
-        score:     score,
-        turn:      this.turn,
-        turn_ends: this.turn_timer ? this.turn_ends : 0,
-        last_move: this.last_move });
+        match_id:    this.match_id,
+        players:     this.players,
+        board:       this.board,
+        regions:     board_regions,
+        score:       score,
+        turn:        this.turn,
+        turn_ends:   this.turn_timer ? this.turn_ends : 0,
+        last_move:   this.last_move,
+        server_time: new Date().getTime() });
     }
 
     this.clients = clients;
