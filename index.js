@@ -105,7 +105,9 @@ io.on('connection', (socket) => {
       pg_pool.query(query, vars, (err, result) => {
         if (err) {
           console.error(err);
+
           socket.emit('logged_in');
+          emitUsers();
         } else if (result.rows.length == 0) {
           query = 'INSERT INTO users (username, user_id) VALUES ($1, $2);';
           vars  = [ username, client.id ];
@@ -116,6 +118,7 @@ io.on('connection', (socket) => {
             }
 
             socket.emit('logged_in');
+            emitUsers();
           });
         } else {
           const old_id = client.id;
@@ -125,6 +128,7 @@ io.on('connection', (socket) => {
 
           socket.emit('id', client.id);
           socket.emit('logged_in');
+          emitUsers();
         }
       });
 
@@ -135,21 +139,6 @@ io.on('connection', (socket) => {
           'socket.io',
           'Client has set username',
           { client_id: client.id, username: username });
-
-      // Broadcast the list of users to all clients,
-      // so that everybody has a live list of all online users
-      const users_info =
-        Object.keys(clients)
-            .filter((c) => {
-              return clients[c].username;
-            })
-            .map((c) => {
-              return {
-                id:       clients[c].id,
-                username: clients[c].username };
-            });
-
-      io.emit('users_list', users_info);
     } else {
       socket.emit(
           'error_message',
@@ -161,6 +150,23 @@ io.on('connection', (socket) => {
           { client_id: client.id, username: username });
     }
   });
+
+  function emitUsers() {
+    // Broadcast the list of users to all clients,
+    // so that everybody has a live list of all online users
+    const users_info =
+      Object.keys(clients)
+          .filter((c) => {
+            return clients[c].username;
+          })
+          .map((c) => {
+            return {
+              id:       clients[c].id,
+              username: clients[c].username };
+          });
+
+    io.emit('users_list', users_info);
+  }
 
 
   // -------------------------------------------------------------- Match Setup

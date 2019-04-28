@@ -480,6 +480,45 @@ $(() => {
 
       $('#match-info-players').html(players_html);
       $('#match-info-n_regions').text(data.regions.n_regions);
+
+      // Turn history
+      const history      = JSON.parse(data.history);
+      let   history_html = '';
+
+      for (let i = 0; i < history.length; i++) {
+        // Timestamps
+        const seconds           = Math.floor(history[i].time / 1000);
+        const minutes           = Math.floor(seconds / 60);
+        const seconds_of_minute = seconds % 60;
+
+        history_html
+          += ' <span class="subdued">('
+          +  minutes
+          +  'm:'
+          +  seconds_of_minute
+          +  's)</span> ';
+
+        // Actual moves
+        const player_colour
+          = colours.player_colours[history[i].player].css_hex;
+
+        const cs = '<span style="color: ' +  player_colour +  ';">';
+        const ce = '</span>';
+
+        if (history[i].type == 'move') {
+          history_html
+            += cs + history[i].from.x + ',' + history[i].from.y + ce
+            +  '➡️'
+            +  cs + history[i].to.x + ',' + history[i].to.y + ce;
+        } else if (history[i].type == 'burn') {
+          history_html
+            += '🔥'
+            +  cs + history[i].to.x + ',' + history[i].to.y + ce
+            +  '<br />';
+        }
+      }
+
+      $('#match-turn-history').html(history_html);
     }
   });
 

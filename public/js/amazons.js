@@ -21,6 +21,9 @@ class Amazons {
         this.advanceTurn();
       }
     }, 10);
+
+    // History
+    this.turn_history = [];
   }
 
   begin(clients) {
@@ -59,6 +62,12 @@ class Amazons {
         this.board.board[from.x][from.y] = { type: 'tile' };
 
         this.piece_has_moved = true;
+        this.turn_history.push({
+          time:   new Date().getTime() - this.match_started,
+          type:   'move',
+          player: this.turn,
+          from:   from,
+          to:     to });
 
         // Set new position of the piece so we can check for valid burn next
         this.moved_piece = { x: to.x, y: to.y };
@@ -91,6 +100,13 @@ class Amazons {
         this.last_move[this.last_mover].burn = {
           from: this.moved_piece,
           to: tile };
+
+        this.turn_history.push({
+          time:   new Date().getTime() - this.match_started,
+          type:   'burn',
+          player: this.turn,
+          from:   this.moved_piece,
+          to:     tile });
 
         this.advanceTurn();
         return true;
@@ -159,7 +175,8 @@ class Amazons {
         turn:        this.turn,
         turn_ends:   this.turn_timer ? this.turn_ends : 0,
         last_move:   this.last_move,
-        server_time: new Date().getTime() });
+        server_time: new Date().getTime(),
+        history:     JSON.stringify(this.turn_history) });
     }
 
     this.clients = clients;
