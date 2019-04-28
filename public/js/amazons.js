@@ -18,18 +18,7 @@ class Amazons {
 
     this.timer = setInterval(() => {
       if (this.turn_timer && (new Date().getTime() > this.turn_ends)) {
-        this.turn += 1;
-        if (this.turn == this.players.length) {
-          this.turn = 0;
-        }
-        this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
-
-        this.piece_has_moved = false;
-        this.moved_piece = { x: -1, y: -1 };
-
-        if (this.clients) {
-          this.emitBoard(this.clients);
-        }
+        this.advanceTurn();
       }
     }, 10);
   }
@@ -52,6 +41,13 @@ class Amazons {
   attemptMove(from, to) {
     // Check whether a piece has already moved this turn
     if (this.piece_has_moved) {
+      return false;
+    }
+
+    if (!(from.x >= 0 && from.y >= 0 && from.x < this.board.size && from.y < this.board.size)) { // eslint-disable-line max-len
+      return false;
+    }
+    if (!(to.x >= 0 && to.y >= 0 && to.x < this.board.size && to.y < this.board.size)) { // eslint-disable-line max-len
       return false;
     }
 
@@ -84,6 +80,10 @@ class Amazons {
       return false;
     }
 
+    if (!(tile.x >= 0 && tile.y >= 0 && tile.x < this.board.size && tile.y < this.board.size)) { // eslint-disable-line max-len
+      return false;
+    }
+
     if (this.board.board[tile.x][tile.y].type == 'tile') {
       if (this.game_logic.validMove(this.moved_piece, tile, this.board.board)) {
         this.board.board[tile.x][tile.y] = { type: 'burned' };
@@ -110,6 +110,10 @@ class Amazons {
     this.piece_has_moved = false;
     this.moved_piece = { x: -1, y: -1 };
 
+    if (this.clients) {
+      this.emitBoard(this.clients);
+    }
+
     // Check whether the next move is an AI move
     this.checkForAITurn();
   }
@@ -120,12 +124,13 @@ class Amazons {
           this.players[i].type == 'bot') {
         const move = this.ai.getMove(
             this.players[i].id,
-            { board:   this.board,
+            { players: this.players,
+              board:   this.board,
               regions: this.game_logic.getBoardRegions(this.board.board) },
             this.players[i].internal_id
         );
 
-        if (move) {
+        if (move && move.move && move.burn) {
           this.attemptMove(move.move.from, move.move.to);
           this.attemptBurn(move.burn);
         } else {
