@@ -13,6 +13,8 @@ class Amazons {
 
     this.last_move = {};
 
+    this.match_started = new Date().getTime();
+
     this.timer = setInterval(() => {
       if (this.turn_timer && (new Date().getTime() > this.turn_ends)) {
         this.turn += 1;
@@ -39,9 +41,10 @@ class Amazons {
       }
 
       clients[this.players[i].id].socket.emit('match_begin', {
-        match_id:   this.match_id,
-        players:    this.players,
-        board:      this.board });
+        match_id:      this.match_id,
+        players:       this.players,
+        board:         this.board,
+        match_started: this.match_started });
     }
   }
 

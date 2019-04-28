@@ -455,14 +455,22 @@ $(() => {
   });
 
   function turn_timer() {
-    if (game_states[showing_match].turn_ends) {
-      let text = ((game_states[showing_match].turn_ends - new Date().getTime()) / 1000).toFixed(1); // eslint-disable-line max-len
+    // Update match time
+    if (game_states[showing_match]) {
+      const minutes = ((new Date().getTime() - game_states[showing_match].match_started) / 1000 / 60).toFixed(0); // eslint-disable-line max-len
+      const seconds = ((new Date().getTime() - game_states[showing_match].match_started) / 1000 % 60).toFixed(0); // eslint-disable-line max-len
+      $('#match-time').html(minutes + '<span class="subdued">m</span>:' + seconds + '<span class="subdued">s</span>'); // eslint-disable-line max-len
 
-      if (!game_states[showing_match].turn == game_states[showing_match].miid) {
-        text = '<span class="subdued">' + text + '</span>';
+      // Update turn timer
+      if (game_states[showing_match].turn_ends) {
+        let text = ((game_states[showing_match].turn_ends - new Date().getTime()) / 1000).toFixed(1); // eslint-disable-line max-len
+
+        if (!game_states[showing_match].turn == game_states[showing_match].miid) { // eslint-disable-line max-len
+          text = '<span class="subdued">' + text + '</span>';
+        }
+
+        $('#turn-timer').html(text);
       }
-
-      $('#turn-timer').html(text);
     }
   }
 
