@@ -316,12 +316,16 @@ $(() => {
           // Draw an icon if the tile is a valid movement/action point
           if (validMove({ x: sel_x, y: sel_y }, { x: x, y: y }, board.board)) {
             if (game_states[showing_match].moved) {
+              graphics_valid.beginFill(colours.valid_border, .1);
+
               graphics_valid.drawRect(
                   (x * tile_size) + offset + 2,
                   (y * tile_size) + offset + 2,
                   tile_size - 4,
                   tile_size - 4
               );
+
+              graphics_valid.endFill();
             } else {
               graphics_valid.drawCircle(
                   (x * tile_size) + (tile_size / 2) + offset,
