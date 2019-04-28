@@ -215,7 +215,7 @@ $(() => {
       { hex: 0x00FF88, css_hex: '#00FF88' },
       { hex: 0x0088FF, css_hex: '#0088FF' },
       { hex: 0xFF8800, css_hex: '#FF8800' },
-      { hex: 0xFF0088, css_hex: '#FF0088' }]};
+      { hex: 0xFF0000, css_hex: '#FF0000' }]};
 
   const tile_size = 50;
 
@@ -465,7 +465,7 @@ $(() => {
       if (game_states[showing_match].turn_ends) {
         let text = ((game_states[showing_match].turn_ends - new Date().getTime()) / 1000).toFixed(1); // eslint-disable-line max-len
 
-        if (!game_states[showing_match].turn == game_states[showing_match].miid) { // eslint-disable-line max-len
+        if (!(game_states[showing_match].turn == game_states[showing_match].miid)) { // eslint-disable-line max-len
           text = '<span class="subdued">' + text + '</span>';
         } else {
           text
