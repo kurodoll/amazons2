@@ -97,8 +97,12 @@ io.on('connection', (socket) => {
 
     if (clients[player_id]) {
       clients[player_id].socket.emit('match_invite', {
-        from:     client.username,
-        match_id: match_invite_id });
+        from:            client.username,
+        match_invite_id: match_invite_id });
+
+      socket.emit('set_invite_id', {
+        player:          player_id,
+        match_invite_id: match_invite_id });
     }
 
     match_invites[match_invite_id] = {
@@ -120,8 +124,9 @@ io.on('connection', (socket) => {
     clients[match_invites[match_invite_id].from].socket.emit(
         'invite_response',
         {
-          player_id: match_invites[match_invite_id].to,
-          response: 'accepted' });
+          player_id:       match_invites[match_invite_id].to,
+          match_invite_id: match_invite_id,
+          response:        'accepted' });
 
     log('socket.io', 'Match invite accepted', {
       id:   match_invite_id,
@@ -141,6 +146,7 @@ io.on('connection', (socket) => {
         'invite_response',
         {
           player_id: match_invites[match_invite_id].to,
+          match_invite_id: match_invite_id,
           response: 'declined' });
 
     log('socket.io', 'Match invite declined', {

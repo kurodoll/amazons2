@@ -125,6 +125,15 @@ $(() => {
     updateInvitedPlayers();
   });
 
+  socket.on('set_invite_id', (info) => {
+    for (let i = 0; i < invited_players.length; i++) {
+      if (invited_players[i].id == info.player) {
+        invited_players[i].match_invite_id = info.match_invite_id;
+        return;
+      }
+    }
+  });
+
   // User has received an invite to a match
   socket.on('match_invite', (info) => {
     const this_notification_id = notification_id;
@@ -137,7 +146,7 @@ $(() => {
 
     notification_list.push({
       id:              this_notification_id,
-      match_invite_id: info.match_id,
+      match_invite_id: info.match_invite_id,
       text:            notification,
       active:          true });
 
@@ -168,7 +177,8 @@ $(() => {
 
   socket.on('invite_response', (info) => {
     for (let i = 0; i < invited_players.length; i++) {
-      if (invited_players[i].id == info.player_id) {
+      if (invited_players[i].id == info.player_id &&
+          invited_players[i].match_invite_id == info.match_invite_id) {
         invited_players[i].accepted = info.response;
         break;
       }
