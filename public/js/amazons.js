@@ -24,6 +24,10 @@ class Amazons {
 
     // History
     this.turn_history = [];
+
+    // Match end
+    this.losers = [];
+    this.winner = null;
   }
 
   begin(clients) {
@@ -42,6 +46,10 @@ class Amazons {
   }
 
   attemptMove(from, to) {
+    if (this.winner) {
+      return;
+    }
+
     // Check whether a piece has already moved this turn
     if (this.piece_has_moved) {
       return false;
@@ -84,6 +92,10 @@ class Amazons {
   }
 
   attemptBurn(tile) {
+    if (this.winner) {
+      return;
+    }
+
     // Make sure that a piece has already moved this turn
     if (!this.piece_has_moved) {
       return false;
@@ -117,21 +129,30 @@ class Amazons {
   }
 
   advanceTurn() {
+    if (this.winner) {
+      return;
+    }
+
     this.turn += 1;
     if (this.turn == this.players.length) {
       this.turn = 0;
     }
-    this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
 
-    this.piece_has_moved = false;
-    this.moved_piece = { x: -1, y: -1 };
+    if (this.losers.indexOf(this.turn) != -1) {
+      this.advanceTurn();
+    } else {
+      this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
 
-    if (this.clients) {
-      this.emitBoard(this.clients);
+      this.piece_has_moved = false;
+      this.moved_piece = { x: -1, y: -1 };
+
+      if (this.clients) {
+        this.emitBoard(this.clients);
+      }
+
+      // Check whether the next move is an AI move
+      this.checkForAITurn();
     }
-
-    // Check whether the next move is an AI move
-    this.checkForAITurn();
   }
 
   checkForAITurn() {
@@ -150,7 +171,24 @@ class Amazons {
           this.attemptMove(move.move.from, move.move.to);
           this.attemptBurn(move.burn);
         } else {
+          this.resign(this.players[i].internal_id);
           this.advanceTurn();
+        }
+      }
+    }
+  }
+
+  resign(player_id) {
+    if (this.winner) {
+      return;
+    }
+
+    this.losers.push(player_id);
+
+    if (this.losers.length >= this.players.length - 1) {
+      for (let i = 0; i < this.players.length; i++) {
+        if (this.losers.indexOf(this.players[i].internal_id) == -1) {
+          this.winner = this.players[i];
         }
       }
     }
@@ -159,6 +197,24 @@ class Amazons {
   emitBoard(clients) {
     const board_regions = this.game_logic.getBoardRegions(this.board.board);
     const score         = this.game_logic.getScoreSimple(this.board.board, board_regions.tiles); // eslint-disable-line max-len
+
+    // Check for players that have no valid moves left
+    let highest_score = 0;
+
+    for (const i in score.points) {
+      if (score.points[i] > highest_score) {
+        highest_score = score.points[i];
+      }
+    }
+
+    for (const i in score.points) {
+      if (score.points[i] == score.points_potential[i] &&
+          score.points[i] != highest_score) {
+        if (this.losers.indexOf(parseInt(i)) == -1) {
+          this.resign(parseInt(i));
+        }
+      }
+    }
 
     for (let i = 0; i < this.players.length; i++) {
       // If the player has disconnected, ignore them
@@ -176,7 +232,9 @@ class Amazons {
         turn_ends:   this.turn_timer ? this.turn_ends : 0,
         last_move:   this.last_move,
         server_time: new Date().getTime(),
-        history:     JSON.stringify(this.turn_history) });
+        history:     JSON.stringify(this.turn_history),
+        losers:      this.losers,
+        winner:      this.winner });
     }
 
     this.clients = clients;

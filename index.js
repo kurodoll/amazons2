@@ -160,9 +160,11 @@ io.on('connection', (socket) => {
             return clients[c].username;
           })
           .map((c) => {
-            return {
-              id:       clients[c].id,
-              username: clients[c].username };
+            if (c) {
+              return {
+                id:       clients[c].id,
+                username: clients[c].username };
+            }
           });
 
     io.emit('users_list', users_info);

@@ -441,6 +441,7 @@ $(() => {
       game_states[data.match_id].turn      = data.turn;
       game_states[data.match_id].turn_ends = data.turn_ends;
       game_states[data.match_id].last_move = data.last_move;
+      game_states[data.match_id].winner    = data.winner;
       drawBoard(data.board);
 
       game_states[data.match_id].time_offset =
@@ -454,6 +455,10 @@ $(() => {
 
       // Display player info
       let players_html = '';
+
+      if (data.winner) {
+        players_html += '<h2>' + data.winner.username + ' wins!</h2>';
+      }
 
       for (let i = 0; i < data.players.length; i++) {
         const player_colour
@@ -471,7 +476,11 @@ $(() => {
           +  data.players[i].id
           + '</span>';
 
-        if (data.turn == data.players[i].internal_id) {
+        if (data.losers.indexOf(data.players[i].internal_id) != -1) {
+          players_html += ' (resigned)';
+        }
+
+        if (!data.winner && (data.turn == data.players[i].internal_id)) {
           players_html += ' (current player)';
         }
 
@@ -557,7 +566,8 @@ $(() => {
   // ------------------------------------------------------------- Handle Input
   $('#game').on('click tap', function(e) {
     // Only allow clicks if it's the user's turn
-    if (game_states[showing_match].turn == game_states[showing_match].miid) {
+    if (game_states[showing_match].turn == game_states[showing_match].miid &&
+        !game_states[showing_match].winner) {
       // Get the mouse position
       const element = $(this);
       const mouse_x = e.pageX - element.offset().left;
