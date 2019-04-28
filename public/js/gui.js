@@ -194,7 +194,8 @@ $(() => {
     socket.emit('match_start', {
       players:      invited_players,
       board_size:   $('#set-board-size').val(),
-      piece_config: $('#set-pieces').val() });
+      piece_config: $('#set-pieces').val(),
+      turn_timer:   $('#set-turn-timer').val() });
 
     return false;
   });
@@ -399,6 +400,7 @@ $(() => {
     // Show the Match Info box
     $('#match-info').show();
     $('#match-info-id').text(data.match_id);
+    $('#turn-timer').html('');
 
     $('#sound-match-start')[0].play();
   });
@@ -411,8 +413,14 @@ $(() => {
 
       game_states[data.match_id].board     = data.board;
       game_states[data.match_id].turn      = data.turn;
+      game_states[data.match_id].turn_ends = data.turn_ends;
       game_states[data.match_id].last_move = data.last_move;
       drawBoard(data.board);
+
+      // This is to reset the local move data if a player's turn time runs out
+      if (data.turn != game_states[showing_match].miid) {
+        game_states[showing_match].moved = false;
+      }
 
       // Display player info
       let players_html = '';
@@ -445,6 +453,20 @@ $(() => {
       $('#match-info-n_regions').text(data.regions.n_regions);
     }
   });
+
+  function turn_timer() {
+    if (game_states[showing_match].turn_ends) {
+      let text = ((game_states[showing_match].turn_ends - new Date().getTime()) / 1000).toFixed(1); // eslint-disable-line max-len
+
+      if (!game_states[showing_match].turn == game_states[showing_match].miid) {
+        text = '<span class="subdued">' + text + '</span>';
+      }
+
+      $('#turn-timer').html(text);
+    }
+  }
+
+  setInterval(turn_timer, 100);
 
 
   // ------------------------------------------------------------- Handle Input

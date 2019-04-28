@@ -1,15 +1,34 @@
 class Amazons {
-  constructor(match_id, players, board, game_logic) {
+  constructor(match_id, players, board, turn_timer, game_logic) {
     this.match_id   = match_id;
     this.players    = players;
     this.board      = board;
+    this.turn_timer = turn_timer;
     this.game_logic = game_logic;
 
     this.turn = 0;
+    this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
     this.piece_has_moved = false;
     this.moved_piece = { x: -1, y: -1 };
 
     this.last_move = {};
+
+    this.timer = setInterval(() => {
+      if (this.turn_timer && (new Date().getTime() > this.turn_ends)) {
+        this.turn += 1;
+        if (this.turn == this.players.length) {
+          this.turn = 0;
+        }
+        this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
+
+        this.piece_has_moved = false;
+        this.moved_piece = { x: -1, y: -1 };
+
+        if (this.clients) {
+          this.emitBoard(this.clients);
+        }
+      }
+    }, 10);
   }
 
   begin(clients) {
@@ -20,9 +39,9 @@ class Amazons {
       }
 
       clients[this.players[i].id].socket.emit('match_begin', {
-        match_id: this.match_id,
-        board:    this.board,
-        players:  this.players });
+        match_id:   this.match_id,
+        players:    this.players,
+        board:      this.board });
     }
   }
 
@@ -67,6 +86,7 @@ class Amazons {
         if (this.turn == this.players.length) {
           this.turn = 0;
         }
+        this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
 
         this.last_move[this.last_mover].burn = {
           from: this.moved_piece,
@@ -94,13 +114,16 @@ class Amazons {
 
       clients[this.players[i].id].socket.emit('board_update', {
         match_id:  this.match_id,
+        players:   this.players,
         board:     this.board,
         regions:   board_regions,
-        players:   this.players,
         score:     score,
         turn:      this.turn,
+        turn_ends: this.turn_timer ? this.turn_ends : 0,
         last_move: this.last_move });
     }
+
+    this.clients = clients;
   }
 
   setPlayer(client_id, internal_id) {

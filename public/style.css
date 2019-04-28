@@ -186,6 +186,7 @@ input.btn-large:hover {
   background-color: rgba(255,192,128,0.1);
   border: 1px #ffc080 solid;
 }
-input#set-board-size {
+input#set-board-size,
+textarea#set-pieces {
   margin-bottom: 5px;
 }

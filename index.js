@@ -186,7 +186,15 @@ io.on('connection', (socket) => {
     const match_id = genID('match');
 
     const board = new Board(parseInt(settings.board_size), pieces);
-    const game  = new Amazons(match_id, players_real, board, game_logic);
+
+    const game = new Amazons(
+        match_id,
+        players_real,
+        board,
+        parseInt(settings.turn_timer),
+        game_logic
+    );
+
     matches[match_id] = game;
 
     // Set players
