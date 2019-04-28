@@ -471,7 +471,7 @@ $(() => {
 
       // Update turn timer
       if (game_states[showing_match].turn_ends) {
-        let text = ((game_states[showing_match].turn_ends - new Date().getTime() + game_states[showing_match].time_offset) / 1000).toFixed(1); // eslint-disable-line max-len
+        let text = ((game_states[showing_match].turn_ends - new Date().getTime() - game_states[showing_match].time_offset) / 1000).toFixed(1); // eslint-disable-line max-len
 
         if (!(game_states[showing_match].turn == game_states[showing_match].miid)) { // eslint-disable-line max-len
           text = '<span class="subdued">' + text + '</span>';
