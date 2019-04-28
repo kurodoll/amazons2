@@ -525,7 +525,7 @@ $(() => {
   function turn_timer() {
     // Update match time
     if (game_states[showing_match]) {
-      const seconds           = Math.floor((new Date().getTime() - game_states[showing_match].match_started - game_states[showing_match].time_offset) / 1000); // eslint-disable-line max-len
+      const seconds           = Math.floor((new Date().getTime() + game_states[showing_match].time_offset - game_states[showing_match].match_started) / 1000); // eslint-disable-line max-len
       const minutes           = Math.floor(seconds / 60);
       const seconds_of_minute = seconds % 60;
 
