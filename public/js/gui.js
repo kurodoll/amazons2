@@ -118,10 +118,27 @@ $(() => {
     invited_players.push({
       id:       e.target.id,
       username: e.target.text,
+      type:     'human',
       accepted: 'pending' });
 
     // Send the invited player a notification
     socket.emit('player_invite', e.target.id);
+    updateInvitedPlayers();
+  });
+
+  // User is inviting a bot to their match
+  $('#bot-list-box').on('click', 'a', (e) => {
+    // Ensure that the New Match dialog is open
+    if (!setting_up_match) {
+      return;
+    }
+
+    invited_players.push({
+      id:       e.target.id,
+      username: e.target.text,
+      type:     'bot',
+      accepted: 'accepted' });
+
     updateInvitedPlayers();
   });
 

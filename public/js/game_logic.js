@@ -211,8 +211,23 @@ function getScoreSimple(board, regions) {
     points_potential: points_potential };
 }
 
+function getAmazons(board) {
+  const amazons = [];
+
+  for (let x = 0; x < board.length; x++) {
+    for (let y = 0; y < board[x].length; y++) {
+      if (board[x][y].type == 'amazon') {
+        amazons.push(board[x][y]);
+      }
+    }
+  }
+
+  return amazons;
+}
+
 
 module.exports = {
   validMove:       validMove,
   getBoardRegions: getBoardRegions,
-  getScoreSimple:  getScoreSimple };
+  getScoreSimple:  getScoreSimple,
+  getAmazons:      getAmazons };

@@ -1,10 +1,11 @@
 class Amazons {
-  constructor(match_id, players, board, turn_timer, game_logic) {
+  constructor(match_id, players, board, turn_timer, game_logic, ai) {
     this.match_id   = match_id;
     this.players    = players;
     this.board      = board;
     this.turn_timer = turn_timer;
     this.game_logic = game_logic;
+    this.ai         = ai;
 
     this.turn = 0;
     this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
@@ -56,7 +57,9 @@ class Amazons {
 
     if (this.board.board[from.x][from.y].type == 'amazon') {
       if (this.game_logic.validMove(from, to, this.board.board)) {
-        this.board.board[to.x][to.y] = this.board.board[from.x][from.y];
+        this.board.board[to.x][to.y]     = this.board.board[from.x][from.y];
+        this.board.board[to.x][to.y].x   = to.x;
+        this.board.board[to.x][to.y].y   = to.y;
         this.board.board[from.x][from.y] = { type: 'tile' };
 
         this.piece_has_moved = true;
@@ -85,24 +88,51 @@ class Amazons {
       if (this.game_logic.validMove(this.moved_piece, tile, this.board.board)) {
         this.board.board[tile.x][tile.y] = { type: 'burned' };
 
-        this.turn += 1;
-        if (this.turn == this.players.length) {
-          this.turn = 0;
-        }
-        this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
-
         this.last_move[this.last_mover].burn = {
           from: this.moved_piece,
           to: tile };
 
-        this.piece_has_moved = false;
-        this.moved_piece = { x: -1, y: -1 };
-
+        this.advanceTurn();
         return true;
       }
     }
 
     return false;
+  }
+
+  advanceTurn() {
+    this.turn += 1;
+    if (this.turn == this.players.length) {
+      this.turn = 0;
+    }
+    this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
+
+    this.piece_has_moved = false;
+    this.moved_piece = { x: -1, y: -1 };
+
+    // Check whether the next move is an AI move
+    this.checkForAITurn();
+  }
+
+  checkForAITurn() {
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].internal_id == this.turn &&
+          this.players[i].type == 'bot') {
+        const move = this.ai.getMove(
+            this.players[i].id,
+            { board:   this.board,
+              regions: this.game_logic.getBoardRegions(this.board.board) },
+            this.players[i].internal_id
+        );
+
+        if (move) {
+          this.attemptMove(move.move.from, move.move.to);
+          this.attemptBurn(move.burn);
+        } else {
+          this.advanceTurn();
+        }
+      }
+    }
   }
 
   emitBoard(clients) {

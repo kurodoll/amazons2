@@ -50,9 +50,18 @@
     <!-- Main Content -->
     <div id='main-content'>
       <div class='container'>
-        <div id='users-list-box'>
-          <p class='heading'>Online Users <span class='subdued'>(<span id='users-count'></span>)</span></p>
-          <p id='users-list'></p>
+        <div id='users-list-container' class='container-col'>
+          <div id='users-list-box'>
+            <p class='heading'>Online Users <span class='subdued'>(<span id='users-count'></span>)</span></p>
+            <p id='users-list'></p>
+          </div>
+
+          <div id='bot-list-box'>
+              <p class='heading'>AI Players</p>
+              <p id='bot-list'>
+                <a id='_bot-air' href='#'>Air</a> <span class='subdued'>(plays random moves)</span>
+              </p>
+            </div>
         </div>
 
         <div id='new-match'>

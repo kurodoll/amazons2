@@ -10,11 +10,12 @@ const io = require('socket.io')(http, {
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Local JavaScripts
+const game_logic = require(path.join(__dirname, 'public/js/game_logic'));
+
 const Client  = require(path.join(__dirname, 'public/js/client'));
 const Board   = require(path.join(__dirname, 'public/js/board'));
 const Amazons = require(path.join(__dirname, 'public/js/amazons'));
-
-const game_logic = require(path.join(__dirname, 'public/js/game_logic'));
+const AI      = new (require(path.join(__dirname, 'public/js/ai')))(game_logic);
 
 
 // ========================================================================= //
@@ -164,6 +165,11 @@ io.on('connection', (socket) => {
 
     for (let i = 0; i < settings.players.length; i++) {
       if (settings.players[i].accepted == 'accepted') {
+        // If the player is a bot, give them a unique ID
+        if (settings.players[i].type == 'bot') {
+          settings.players[i].id = genID(settings.players[i].id);
+        }
+
         n_players += 1;
         players_real.push(settings.players[i]);
       }
@@ -192,7 +198,8 @@ io.on('connection', (socket) => {
         players_real,
         board,
         parseInt(settings.turn_timer),
-        game_logic
+        game_logic,
+        AI
     );
 
     matches[match_id] = game;
