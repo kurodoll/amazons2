@@ -464,9 +464,11 @@ $(() => {
   function turn_timer() {
     // Update match time
     if (game_states[showing_match]) {
-      const minutes = ((new Date().getTime() - game_states[showing_match].match_started) / 1000 / 60).toFixed(0); // eslint-disable-line max-len
-      const seconds = ((new Date().getTime() - game_states[showing_match].match_started) / 1000 % 60).toFixed(0); // eslint-disable-line max-len
-      $('#match-time').html(minutes + '<span class="subdued">m</span>:' + seconds + '<span class="subdued">s</span>'); // eslint-disable-line max-len
+      const seconds           = Math.floor((new Date().getTime() - game_states[showing_match].match_started - game_states[showing_match].time_offset) / 1000); // eslint-disable-line max-len
+      const minutes           = Math.floor(seconds / 60);
+      const seconds_of_minute = seconds % 60;
+
+      $('#match-time').html(minutes + '<span class="subdued">m</span>:' + seconds_of_minute + '<span class="subdued">s</span>'); // eslint-disable-line max-len
 
       // Update turn timer
       if (game_states[showing_match].turn_ends) {
