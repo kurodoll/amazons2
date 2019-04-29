@@ -443,13 +443,12 @@ function calculatePlayerRatings() {
 
       for (let i = 0; i < result.rows.length; i++) {
         const match = JSON.parse(result.rows[i].match_info);
+        const winner_points = match.score.points[match.winner.internal_id];
 
         if (player_ratings[match.winner.id]) {
-          player_ratings[match.winner.id] +=
-            match.score.points[match.winner.internal_id];
+          player_ratings[match.winner.id] += winner_points / 10;
         } else {
-          player_ratings[match.winner.id] = 1200 +
-            match.score.points[match.winner.internal_id];
+          player_ratings[match.winner.id] = 1200 + winner_points / 10;
         }
 
         for (let i = 0; i < match.players.length; i++) {
@@ -459,10 +458,12 @@ function calculatePlayerRatings() {
 
           if (player_ratings[match.players[i].id]) {
             player_ratings[match.players[i].id] -=
-              match.score.points[match.players[i].internal_id];
+              (winner_points -
+                match.score.points[match.players[i].internal_id]) / 10;
           } else {
             player_ratings[match.players[i].id] = 1200 -
-              match.score.points[match.players[i].internal_id];
+              (winner_points -
+                match.score.points[match.players[i].internal_id]) / 10;
           }
         }
       }
@@ -476,7 +477,7 @@ function calculatePlayerRatings() {
       for (const i in player_ratings) { // eslint-disable-line guard-for-in
         query += '($' + n + ', $' + (n+1) + '), ';
         vars.push(i);
-        vars.push(player_ratings[i]);
+        vars.push(Math.floor(player_ratings[i]));
 
         n += 2;
       }
