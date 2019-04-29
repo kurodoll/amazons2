@@ -66,6 +66,11 @@ $(() => {
     $('#main-content').show();
   });
 
+  socket.on('disconnect', () => {
+    $('#latency').text('Connection Lost');
+    $('#latency').css('border-bottom', '2px rgb(255, 0, 0) dotted');
+  });
+
   socket.on('users_list', (users) => {
     let list_html = '';
 
