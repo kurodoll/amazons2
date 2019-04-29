@@ -261,6 +261,26 @@ class Amazons {
 
     return -1;
   }
+
+  completed() {
+    return this.winner;
+  }
+
+  getInfo() {
+    const board_regions = this.game_logic.getBoardRegions(this.board.board);
+    const score         = this.game_logic.getScoreSimple(this.board.board, board_regions.tiles); // eslint-disable-line max-len
+
+    return {
+      match_id:      this.match_id,
+      players:       this.players,
+      board:         this.board,
+      score:         score,
+      history:       JSON.stringify(this.turn_history),
+      losers:        this.losers,
+      winner:        this.winner,
+      match_started: this.match_started,
+      match_ended:   this.match_ended };
+  }
 }
 
 module.exports = Amazons;

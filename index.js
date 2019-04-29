@@ -84,6 +84,7 @@ const matches       = {};
 // *                                                              Socket.io //
 // ========================================================================//
 io.on('connection', (socket) => {
+  calculatePlayerRatings();
   const client = new Client(genID(), socket);
   clients[client.id] = client;
 
@@ -102,12 +103,11 @@ io.on('connection', (socket) => {
       let query = 'SELECT * FROM users WHERE username = $1;';
       let vars  = [ username ];
 
+      let rating;
+
       pg_pool.query(query, vars, (err, result) => {
         if (err) {
           console.error(err);
-
-          socket.emit('logged_in');
-          emitUsers();
         } else if (result.rows.length == 0) {
           query = 'INSERT INTO users (username, user_id) VALUES ($1, $2);';
           vars  = [ username, client.id ];
@@ -125,6 +125,10 @@ io.on('connection', (socket) => {
           client.changeID(result.rows[0].user_id);
           clients[client.id] = client;
           delete clients[old_id];
+
+          rating = result.rows[0].rating;
+          clients[client.id].rating = rating;
+          socket.emit('rating_set', rating);
 
           socket.emit('id', client.id);
           socket.emit('logged_in');
@@ -163,7 +167,8 @@ io.on('connection', (socket) => {
             if (c) {
               return {
                 id:       clients[c].id,
-                username: clients[c].username };
+                username: clients[c].username,
+                rating:   clients[c].rating };
             }
           });
 
@@ -259,8 +264,14 @@ io.on('connection', (socket) => {
       }
     }
 
-    const pieces = JSON.parse(settings.piece_config);
-    let   correct_players = 0;
+    let pieces;
+    try {
+      pieces = JSON.parse(settings.piece_config);
+    } catch (e) {
+      return;
+    }
+
+    let correct_players = 0;
 
     for (let i = 0; i < pieces.length; i++) {
       if (pieces[i].owner > correct_players) {
@@ -383,4 +394,101 @@ function log(caller, message, data) {
 
   process.stdout.write(time_str + ' [' + caller + '] ' + message + ' ');
   console.dir(data);
+}
+
+
+// ========================================================================= //
+// *                                                       Match Monitoring //
+// ========================================================================//
+
+setInterval(() => {
+  for (const m in matches) { // eslint-disable-line guard-for-in
+    const game = matches[m];
+
+    if (game.completed()) {
+      // Save match info
+      const game_info = game.getInfo();
+
+      const query = 'INSERT INTO matches_json (match_info) VALUES ($1);';
+      const vars  = [ JSON.stringify(game_info) ];
+
+      pg_pool.query(query, vars, (err, result) => {
+        if (err) {
+          console.error(err);
+        }
+      });
+
+      delete matches[game_info.match_id];
+      log(
+          'socket.io',
+          'Match completed ('
+            + Object.keys(matches).length
+            + ' still on-going)',
+          game_info
+      );
+
+      calculatePlayerRatings();
+    }
+  }
+}, 60000);
+
+function calculatePlayerRatings() {
+  let query = 'SELECT * FROM matches_json;';
+
+  pg_pool.query(query, (err, result) => {
+    if (err) {
+      console.error(err);
+    } else {
+      const player_ratings = {};
+
+      for (let i = 0; i < result.rows.length; i++) {
+        const match = JSON.parse(result.rows[i].match_info);
+
+        if (player_ratings[match.winner.id]) {
+          player_ratings[match.winner.id] +=
+            match.score.points[match.winner.internal_id];
+        } else {
+          player_ratings[match.winner.id] = 1200 +
+            match.score.points[match.winner.internal_id];
+        }
+
+        for (let i = 0; i < match.players.length; i++) {
+          if (match.players[i].id == match.winner.id) {
+            continue;
+          }
+
+          if (player_ratings[match.players[i].id]) {
+            player_ratings[match.players[i].id] -=
+              match.score.points[match.players[i].internal_id];
+          } else {
+            player_ratings[match.players[i].id] = 1200 -
+              match.score.points[match.players[i].internal_id];
+          }
+        }
+      }
+
+      // Store the ratings
+      let n = 1;
+
+      query = 'UPDATE users SET rating = new.rating FROM (values ';
+      const vars = [];
+
+      for (const i in player_ratings) { // eslint-disable-line guard-for-in
+        query += '($' + n + ', $' + (n+1) + '), ';
+        vars.push(i);
+        vars.push(player_ratings[i]);
+
+        n += 2;
+      }
+
+      query  = query.substring(0, query.length - 2);
+      query += ') AS new(id, rating) WHERE users.user_id = new.id';
+
+      pg_pool.query(query, vars, (err2, result2) => {
+        if (err2) {
+          console.error(err2);
+        }
+      });
+    }
+  });
 }

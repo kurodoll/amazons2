@@ -53,6 +53,10 @@ $(() => {
     user_username = username;
   });
 
+  socket.on('rating_set', (rating) => {
+    $('#user-rating-display').text(rating);
+  });
+
   socket.on('logged_in', () => {
     $('#logging-in-message').hide();
     $('#submit-username').hide();
@@ -71,7 +75,9 @@ $(() => {
         +  users[i].id
         +  '" href="#">'
         +  users[i].username
-        +  '</a><br />';
+        +  '</a> ('
+        +  users[i].rating
+        +  ')<br />';
     }
 
     $('#users-list').html(list_html);
@@ -99,6 +105,7 @@ $(() => {
       invited_players = [{
         id:       user_id,
         username: user_username,
+        type:     'human',
         accepted: 'accepted' }];
 
       updateInvitedPlayers();
