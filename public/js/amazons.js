@@ -165,7 +165,8 @@ class Amazons {
             { players: this.players,
               board:   this.board,
               regions: this.game_logic.getBoardRegions(this.board.board) },
-            this.players[i].internal_id
+            this.players[i].internal_id,
+            this.players[i].bot_type
         );
 
         if (move && move.move && move.burn) {

@@ -24,7 +24,8 @@
 
       <div id='navbar'>
         <p><a id='link-new-match'     href='#'>New Match</a> | </p>
-        <p><a id='link-match-history' href='#'>Match History</a></p>
+        <p><a id='link-match-history' href='#'>Match History</a> | </p>
+        <p><a id='link-ai'            href='#'>AI</a></p>
       </div>
 
       <div id='user-cp'>
@@ -62,14 +63,30 @@
 
           <div id='bot-list-box'>
               <p class='heading'>AI Players</p>
-              <p id='bot-list'>
-                <a id='_bot-airi' href='#'>Airi</a> <span class='subdued'>(plays random moves)</span><br />
-                <a id='_bot-sai' href='#'>Sai</a> <span class='subdued'>(example "AI")</span>
-              </p>
+              <p id='bot-list'></p>
             </div>
         </div>
 
         <div id='match-history'></div>
+
+        <div id='ai'>
+          <label>AI Name</label>
+          <input id='ai-name' type='text'>
+
+          <label>AI Code</label>
+          <div id='ai-code'></div>
+
+          <script src='https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.4/ace.js' type='text/javascript' charset='utf-8'></script>
+          <script>
+              const editor = ace.edit('ai-code');
+              editor.setTheme('ace/theme/cobalt');
+              editor.session.setMode('ace/mode/javascript');
+          </script>
+
+          <form id='ai-submit-form'>
+            <input class='btn-large' type='submit' value='Submit' />
+          </form>
+        </div>
 
         <div id='new-match'>
           <h2>New Match</h2>

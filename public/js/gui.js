@@ -162,6 +162,33 @@ $(() => {
   });
 
 
+  // ----------------------------------------------------------------------- AI
+  socket.on('ai_players', (ai_players) => {
+    let bot_list_html = '';
+
+    for (let i = 0; i < ai_players.length; i++) {
+      bot_list_html
+        += '<a id="'
+        +  ai_players[i].name
+        +  '" href="#">'
+        +  ai_players[i].name
+        +  '</a><br />';
+    }
+
+    $('#bot-list').html(bot_list_html);
+  });
+
+  $('#ai-submit-form').submit((e) => {
+    e.preventDefault();
+
+    socket.emit('new_ai', {
+      name: $('#ai-name').val(),
+      code: editor.getValue() });
+
+    return false;
+  });
+
+
   // -------------------------------------------------------------- Match Setup
   let   setting_up_match  = false;
   let   invited_players   = [];
@@ -185,6 +212,8 @@ $(() => {
     } else if (e.target.id == 'link-match-history') {
       socket.emit('get_match_history');
       $('#match-history').show();
+    } else if (e.target.id == 'link-ai') {
+      $('#ai').show();
     }
   });
 

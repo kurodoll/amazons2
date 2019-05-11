@@ -134,7 +134,7 @@ div#match-history
 
   background-color clr-bg-darken
 
-div#new-match
+div#ai
   order 3
   display none
 
@@ -143,8 +143,17 @@ div#new-match
 
   background-color clr-bg-darken
 
-div#match-info
+div#new-match
   order 4
+  display none
+
+  margin-left 5px
+  padding 10px
+
+  background-color clr-bg-darken
+
+div#match-info
+  order 5
   display none
 
   margin-left 5px
@@ -154,7 +163,7 @@ div#match-info
   background-color clr-bg-darken
 
 div#game-container
-  order 5
+  order 6
   display none
 
   margin-left 10px
@@ -256,6 +265,9 @@ input, textarea
   font 10px Verdana
   color clr-text
 
+textarea
+  font 11px Consolas
+
 input:hover, textarea:hover
   background clr-input-bg-hover
 
@@ -279,5 +291,15 @@ input.btn-large:hover
   background-color alpha(clr-text-highlight, .1)
   border 1px clr-text-highlight solid
 
-input#set-board-size, textarea#set-pieces
+input#set-board-size, input#ai-name, textarea#set-pieces
   margin-bottom 5px
+
+
+// ========================================================================= //
+// *                                                                  Other //
+// ========================================================================//
+div#ai-code
+  width 1000px
+  height 700px
+
+  font 11px Consolas

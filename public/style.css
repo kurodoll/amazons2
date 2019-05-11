@@ -94,15 +94,22 @@ div#match-history {
   padding: 10px;
   background-color: rgba(0,0,0,0.25);
 }
-div#new-match {
+div#ai {
   order: 3;
   display: none;
   margin-left: 5px;
   padding: 10px;
   background-color: rgba(0,0,0,0.25);
 }
-div#match-info {
+div#new-match {
   order: 4;
+  display: none;
+  margin-left: 5px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
+}
+div#match-info {
+  order: 5;
   display: none;
   margin-left: 5px;
   padding: 10px;
@@ -110,7 +117,7 @@ div#match-info {
   background-color: rgba(0,0,0,0.25);
 }
 div#game-container {
-  order: 5;
+  order: 6;
   display: none;
   margin-left: 10px;
 }
@@ -194,6 +201,9 @@ textarea {
   font: 10px Verdana;
   color: #fff;
 }
+textarea {
+  font: 11px Consolas;
+}
 input:hover,
 textarea:hover {
   background: rgba(0,0,0,0.5);
@@ -217,6 +227,12 @@ input.btn-large:hover {
   border: 1px #ffc080 solid;
 }
 input#set-board-size,
+input#ai-name,
 textarea#set-pieces {
   margin-bottom: 5px;
+}
+div#ai-code {
+  width: 1000px;
+  height: 700px;
+  font: 11px Consolas;
 }
