@@ -176,6 +176,32 @@ io.on('connection', (socket) => {
   }
 
 
+  // ---------------------------------------------------------------- User Info
+  socket.on('get_match_history', () => {
+    const query = 'SELECT * FROM matches_json;';
+
+    pg_pool.query(query, (err, result) => {
+      if (err) {
+        console.error(err);
+      } else {
+        const user_matches = [];
+
+        for (let i = 0; i < result.rows.length; i++) {
+          const match_info = JSON.parse(result.rows[i].match_info);
+
+          for (let j = 0; j < match_info.players.length; j++) {
+            if (match_info.players[j].id == client.id) {
+              user_matches.push(match_info);
+            }
+          }
+        }
+
+        socket.emit('match_history', user_matches);
+      }
+    });
+  });
+
+
   // -------------------------------------------------------------- Match Setup
   // User has invited a player to a match
   socket.on('player_invite', (player_id) => {
@@ -443,27 +469,13 @@ function calculatePlayerRatings() {
 
       for (let i = 0; i < result.rows.length; i++) {
         const match = JSON.parse(result.rows[i].match_info);
-        const winner_points = match.score.points[match.winner.internal_id];
+        const match_ratings = game_logic.getMatchRatings(match);
 
-        if (player_ratings[match.winner.id]) {
-          player_ratings[match.winner.id] += winner_points / 10;
-        } else {
-          player_ratings[match.winner.id] = 1200 + winner_points / 10;
-        }
-
-        for (let i = 0; i < match.players.length; i++) {
-          if (match.players[i].id == match.winner.id) {
-            continue;
-          }
-
-          if (player_ratings[match.players[i].id]) {
-            player_ratings[match.players[i].id] -=
-              (winner_points -
-                match.score.points[match.players[i].internal_id]) / 10;
+        for (const r in match_ratings) { // eslint-disable-line guard-for-in
+          if (player_ratings[r]) {
+            player_ratings[r] += match_ratings[r];
           } else {
-            player_ratings[match.players[i].id] = 1200 -
-              (winner_points -
-                match.score.points[match.players[i].internal_id]) / 10;
+            player_ratings[r] = 1200 + match_ratings[r];
           }
         }
       }
@@ -483,7 +495,7 @@ function calculatePlayerRatings() {
       }
 
       query  = query.substring(0, query.length - 2);
-      query += ') AS new(id, rating) WHERE users.user_id = new.id';
+      query += ') AS new(id, rating) WHERE users.user_id = new.id;';
 
       pg_pool.query(query, vars, (err2, result2) => {
         if (err2) {

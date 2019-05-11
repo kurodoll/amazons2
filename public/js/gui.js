@@ -95,6 +95,73 @@ $(() => {
   });
 
 
+  // ---------------------------------------------------------------- User Info
+  socket.on('match_history', (data) => {
+    let match_history_html = '';
+
+    let wins = 0;
+    let losses = 0;
+
+    for (let i = data.length - 1; i >= 0; i--) {
+      let players = '';
+      const player_ratings = getMatchRatings(data[i]);
+
+      for (let j = 0; j < data[i].players.length; j++) {
+        if (data[i].winner.id == data[i].players[j].id) {
+          players += '<span class="highlight">';
+        }
+
+        const colour = player_ratings[data[i].players[j].id] >= 0
+          ? '<span style="color: rgb(0, 255, 128);">+'
+          : '<span style="color: rgb(255, 128, 0);">';
+
+        players
+          += data[i].players[j].username
+          +  ' '
+          +  colour
+          +  player_ratings[data[i].players[j].id]
+          +  '</span>';
+
+        if (data[i].winner.id == data[i].players[j].id) {
+          players += '</span>';
+        }
+
+        players += '<br />';
+      }
+
+      match_history_html
+        += '<span class="subdued">'
+        +  moment(data[i].match_started).fromNow()
+        +  ' (' + data[i].match_id + ')'
+        +  '</span>'
+        +  '<br />'
+        +  players
+        +  '<br />';
+
+      if (data[i].winner.id == user_id) {
+        wins += 1;
+      } else {
+        losses += 1;
+      }
+    }
+
+    match_history_html
+      = '<p>'
+      + '<a id="close-match-history" href="#">Close</a><br /><br />'
+      + 'Wins/Losses: ' + wins + '/' + losses + '<br /><br />'
+      + match_history_html
+      + '</p>';
+
+    $('#match-history').html(match_history_html);
+  });
+
+  $('#match-history').on('click', 'a', (e) => {
+    if (e.target.id == 'close-match-history') {
+      $('#match-history').hide();
+    }
+  });
+
+
   // -------------------------------------------------------------- Match Setup
   let   setting_up_match  = false;
   let   invited_players   = [];
@@ -115,6 +182,9 @@ $(() => {
 
       updateInvitedPlayers();
       $('#new-match').show();
+    } else if (e.target.id == 'link-match-history') {
+      socket.emit('get_match_history');
+      $('#match-history').show();
     }
   });
 

@@ -225,9 +225,26 @@ function getAmazons(board) {
   return amazons;
 }
 
+function getMatchRatings(match) {
+  const player_ratings = {};
+  const winner_points = match.score.points[match.winner.internal_id];
+
+  for (let i = 0; i < match.players.length; i++) {
+    if (match.players[i].id == match.winner.id) {
+      player_ratings[match.players[i].id] = winner_points / 10;
+    } else {
+      player_ratings[match.players[i].id] = 0 - ((winner_points -
+          match.score.points[match.players[i].internal_id]) / 5);
+    }
+  }
+
+  return player_ratings;
+}
+
 
 module.exports = {
   validMove:       validMove,
   getBoardRegions: getBoardRegions,
   getScoreSimple:  getScoreSimple,
-  getAmazons:      getAmazons };
+  getAmazons:      getAmazons,
+  getMatchRatings: getMatchRatings };

@@ -9,6 +9,7 @@
   <script src='https://code.jquery.com/jquery-3.4.0.min.js'></script>
   <script src='/socket.io/socket.io.js'></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.8.7/pixi.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
 
   <!-- Local JavaScripts -->
   <script src='/js/game_logic.js'></script>
@@ -22,7 +23,8 @@
       </div>
 
       <div id='navbar'>
-        <p><a id='link-new-match' href='#'>New Match</a></p>
+        <p><a id='link-new-match'     href='#'>New Match</a> | </p>
+        <p><a id='link-match-history' href='#'>Match History</a></p>
       </div>
 
       <div id='user-cp'>
@@ -66,6 +68,8 @@
               </p>
             </div>
         </div>
+
+        <div id='match-history'></div>
 
         <div id='new-match'>
           <h2>New Match</h2>

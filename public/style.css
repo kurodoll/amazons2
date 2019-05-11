@@ -27,6 +27,9 @@ div#navbar {
   background-color: rgba(0,0,0,0.25);
   border-top: 1px rgba(128,255,192,0.75) solid;
 }
+div#navbar p {
+  display: inline;
+}
 div#navbar p a {
   font-weight: bold;
   color: #80ffc0;
@@ -84,15 +87,22 @@ div#bot-list-box {
   width: 200px;
   background-color: rgba(0,0,0,0.25);
 }
-div#new-match {
+div#match-history {
   order: 2;
   display: none;
   margin-left: 5px;
   padding: 10px;
   background-color: rgba(0,0,0,0.25);
 }
-div#match-info {
+div#new-match {
   order: 3;
+  display: none;
+  margin-left: 5px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.25);
+}
+div#match-info {
+  order: 4;
   display: none;
   margin-left: 5px;
   padding: 10px;
@@ -100,7 +110,7 @@ div#match-info {
   background-color: rgba(0,0,0,0.25);
 }
 div#game-container {
-  order: 4;
+  order: 5;
   display: none;
   margin-left: 10px;
 }
