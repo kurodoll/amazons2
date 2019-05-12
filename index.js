@@ -115,8 +115,12 @@ io.on('connection', (socket) => {
   socket.emit('ai_players', ai_players);
 
   // User has chosen a username
+  let logging_in = false;
+
   socket.on('set_username', (username) => {
-    if (username.length >= 3 && username.length <= 20) {
+    if (username.length >= 3 && username.length <= 20 && !logging_in) {
+      logging_in = true;
+
       // Save username to DB or get saved ID
       let query = 'SELECT * FROM users WHERE username = $1;';
       let vars  = [ username ];
@@ -151,6 +155,8 @@ io.on('connection', (socket) => {
           socket.emit('id', client.id);
           socket.emit('logged_in');
           emitUsers();
+
+          logging_in = false;
         }
       });
 
@@ -161,7 +167,7 @@ io.on('connection', (socket) => {
           'socket.io',
           'Client has set username',
           { client_id: client.id, username: username });
-    } else {
+    } else if (!logging_in) {
       socket.emit(
           'error_message',
           'Username must be 3 to 20 characters long (inclusive)');
