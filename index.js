@@ -236,14 +236,14 @@ io.on('connection', (socket) => {
       } else {
         for (let i = 0; i < result.rows.length; i++) {
           if (result.rows[i].name == data.name) {
-            const query2 = 'UPDATE ai SET code = $1 WHERE name = $2;';
+            /* const query2 = 'UPDATE ai SET code = $1 WHERE name = $2;';
             const vars2  = [ data.code, data.name ];
 
             pg_pool.query(query2, vars2, (err2, result2) => {
               if (err2) {
                 console.error(err2);
               }
-            });
+            });*/
 
             return;
           }
