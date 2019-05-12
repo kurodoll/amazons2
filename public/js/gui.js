@@ -188,6 +188,12 @@ $(() => {
     return false;
   });
 
+  $('#ai').on('click', 'a', (e) => {
+    if (e.target.id == 'close-ai') {
+      $('#ai').hide();
+    }
+  });
+
 
   // -------------------------------------------------------------- Match Setup
   let   setting_up_match  = false;
@@ -331,6 +337,12 @@ $(() => {
       turn_timer:   $('#set-turn-timer').val() });
 
     return false;
+  });
+
+  $('#new-match').on('click', 'a', (e) => {
+    if (e.target.id == 'close-new-match') {
+      $('#new-match').hide();
+    }
   });
 
 
