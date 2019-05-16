@@ -7,6 +7,8 @@ const io = require('socket.io')(http, {
   'pingInterval': 2000,
   'pingTimeout': 5000 });
 
+const bcrypt = require('bcrypt');
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Local JavaScripts
@@ -117,7 +119,12 @@ io.on('connection', (socket) => {
   // User has chosen a username
   let logging_in = false;
 
-  socket.on('set_username', (username) => {
+  socket.on('set_username', (data) => {
+    const username = data.username;
+    const password = data.password;
+
+    let success = false;
+
     if (username.length >= 3 && username.length <= 20 && !logging_in) {
       logging_in = true;
 
@@ -131,8 +138,17 @@ io.on('connection', (socket) => {
         if (err) {
           console.error(err);
         } else if (result.rows.length == 0) {
-          query = 'INSERT INTO users (username, user_id) VALUES ($1, $2);';
-          vars  = [ username, client.id ];
+          query = `INSERT INTO users (username, user_id, password)
+            VALUES ($1, $2, $3);`;
+
+          let pw_final = password;
+
+          if (password.length > 0) {
+            const salt = bcrypt.genSaltSync(10);
+            pw_final = bcrypt.hashSync(password, salt);
+          }
+
+          vars = [ username, client.id, pw_final ];
 
           pg_pool.query(query, vars, (err2, result2) => {
             if (err2) {
@@ -142,31 +158,63 @@ io.on('connection', (socket) => {
             socket.emit('logged_in');
             emitUsers();
           });
+
+          success = true;
         } else {
-          const old_id = client.id;
-          client.changeID(result.rows[0].user_id);
-          clients[client.id] = client;
-          delete clients[old_id];
+          if (!result.rows[0].password && password.length > 0) {
+            const salt = bcrypt.genSaltSync(10);
+            const pass = bcrypt.hashSync(password, salt);
 
-          rating = result.rows[0].rating;
-          clients[client.id].rating = rating;
-          socket.emit('rating_set', rating);
+            query = 'UPDATE users SET password = $1 WHERE id = $2;';
+            vars  = [ pass, result.rows[0].id ];
 
-          socket.emit('id', client.id);
-          socket.emit('logged_in');
-          emitUsers();
+            pg_pool.query(query, vars, (err2, result2) => {
+              if (err2) {
+                console.error(err2);
+              }
+            });
 
-          logging_in = false;
+            success = true;
+          } else if (!result.rows[0].password) {
+            success = true;
+          } else {
+            if (bcrypt.compareSync(password, result.rows[0].password)) {
+              success = true;
+            }
+          }
+
+          if (success) {
+            client.setUsername(username);
+            socket.emit('username_set', username);
+
+            const old_id = client.id;
+            client.changeID(result.rows[0].user_id);
+            clients[client.id] = client;
+            delete clients[old_id];
+
+            rating = result.rows[0].rating;
+            clients[client.id].rating = rating;
+            socket.emit('rating_set', rating);
+
+            socket.emit('id', client.id);
+            socket.emit('logged_in');
+            emitUsers();
+
+            logging_in = false;
+
+            log(
+                'socket.io',
+                'Client has set username',
+                { client_id: client.id, username: username });
+          } else {
+            socket.emit(
+                'error_message',
+                'Username taken/Incorrect credentials');
+
+            logging_in = false;
+          }
         }
       });
-
-      client.setUsername(username);
-      socket.emit('username_set', username);
-
-      log(
-          'socket.io',
-          'Client has set username',
-          { client_id: client.id, username: username });
     } else if (!logging_in) {
       socket.emit(
           'error_message',
@@ -451,7 +499,8 @@ io.on('connection', (socket) => {
           .map((c) => {
             return {
               id:       clients[c].id,
-              username: clients[c].username };
+              username: clients[c].username,
+              rating:   clients[c].rating };
           });
 
     io.emit('users_list', users_info);

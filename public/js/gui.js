@@ -40,7 +40,9 @@ $(() => {
   // User has submitted a username
   $('#submit-username').submit((e) => {
     e.preventDefault();
-    socket.emit('set_username', $('#input-username').val());
+    socket.emit('set_username', {
+      username: $('#input-username').val(),
+      password: $('#input-password').val() });
 
     $('#error-box').hide();
     $('#logging-in-message').show();
@@ -92,6 +94,8 @@ $(() => {
   socket.on('error_message', (message) => {
     $('#error-message').text(message);
     $('#error-box').show();
+
+    $('#logging-in-message').hide();
   });
 
 
