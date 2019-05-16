@@ -558,6 +558,8 @@ $(() => {
     $('#sound-match-start')[0].play();
   });
 
+  let last_turn = -1;
+
   socket.on('board_update', (data) => {
     if (data.match_id == showing_match) {
       if (data.turn != game_states[showing_match].miid) {
@@ -575,6 +577,12 @@ $(() => {
       game_states[data.match_id].time_offset =
         data.server_time - new Date().getTime();
       console.log('Server time offset is ' + game_states[data.match_id].time_offset); // eslint-disable-line max-len
+
+      // Play a sound if a turn was played
+      if (last_turn != data.turn) {
+        last_turn = data.turn;
+        $('#sound-burn')[0].play();
+      }
 
       // This is to reset the local move data if a player's turn time runs out
       if (data.turn != game_states[showing_match].miid) {
