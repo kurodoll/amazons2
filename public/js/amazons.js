@@ -3,6 +3,7 @@ class Amazons {
     this.match_id   = match_id;
     this.players    = players;
     this.board      = board;
+    this.board_orig = board;
     this.turn_timer = turn_timer;
     this.game_logic = game_logic;
     this.ai         = ai;
@@ -275,6 +276,8 @@ class Amazons {
       match_id:      this.match_id,
       players:       this.players,
       board:         this.board,
+      board_orig:    this.board_orig,
+      turn_timer:    this.turn_timer,
       score:         score,
       history:       JSON.stringify(this.turn_history),
       losers:        this.losers,
