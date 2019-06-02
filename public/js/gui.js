@@ -108,41 +108,50 @@ $(() => {
     let wins = 0;
     let losses = 0;
 
+    let winner_username;
+
     for (let i = data.length - 1; i >= 0; i--) {
       let players = '';
       const player_ratings = getMatchRatings(data[i]);
 
       for (let j = 0; j < data[i].players.length; j++) {
-        if (data[i].winner.id == data[i].players[j].id) {
-          players += '<span class="highlight">';
-        }
-
         const colour = player_ratings[data[i].players[j].id] >= 0
-          ? '<span style="color: rgb(0, 255, 128);">+'
+          ? '<span style="color: rgb(0, 255, 128);">'
           : '<span style="color: rgb(255, 128, 0);">';
 
         players
-          += data[i].players[j].username
-          +  ' '
-          +  colour
-          +  player_ratings[data[i].players[j].id]
-          +  '</span>';
+          += colour
+          +  data[i].score.points[j]
+          +  '</span> '
+          +  data[i].players[j].username;
 
         if (data[i].winner.id == data[i].players[j].id) {
-          players += '</span>';
+          winner_username = data[i].players[j].username;
         }
 
         players += '<br />';
       }
 
+      const match_length = data[i].match_ended - data[i].match_started;
+
       match_history_html
-        += '<span class="subdued">'
+        += '<tr><td><p><span class="subdued">'
+        +  data[i].match_id
+        +  '</span></p></td><td><p><span class="subdued">'
+        +  moment(data[i].match_started).format('MMMM Do YYYY, h:mm:ss a')
+        +  ' ('
         +  moment(data[i].match_started).fromNow()
-        +  ' (' + data[i].match_id + ')'
-        +  '</span>'
-        +  '<br />'
+        +  ')</p></span></td><td><p>'
+        +  winner_username
+        +  '</p></td><td><p>'
         +  players
-        +  '<br />';
+        +  '</p></td><td><p>'
+        +  data[i].board.size + 'x' + data[i].board.size
+        +  '</p></td><td><p>'
+        +  JSON.parse(data[i].history).length
+        +  '</p></td><td><p>'
+        +  ((match_length) / 1000 / 60).toFixed(0)
+        +  'm</p></td></tr>';
 
       if (data[i].winner.id == user_id) {
         wins += 1;
@@ -155,8 +164,19 @@ $(() => {
       = '<p>'
       + '<a id="close-match-history" href="#">Close</a><br /><br />'
       + 'Wins/Losses: ' + wins + '/' + losses + '<br /><br />'
+      + '</p>'
+      + '<table>'
+      + '<tr class="header">'
+      + '<td><p>Match ID</p></td>'
+      + '<td><p>Date</p></td>'
+      + '<td><p>Winner</p></td>'
+      + '<td><p>Player Scores</p></td>'
+      + '<td><p>Board Size</p></td>'
+      + '<td><p>Moves</p></td>'
+      + '<td><p>Length</p></td>'
+      + '</tr>'
       + match_history_html
-      + '</p>';
+      + '</table>';
 
     $('#match-history').html(match_history_html);
   });
