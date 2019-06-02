@@ -1,3 +1,5 @@
+// jshint ignore: start
+
 const express = require('express');
 const path = require('path');
 
@@ -276,34 +278,53 @@ io.on('connection', (socket) => {
 
   // ----------------------------------------------------------------------- AI
   socket.on('new_ai', (data) => {
-    const query = 'SELECT name FROM ai;';
+    const query = 'SELECT name, uploader FROM ai;';
 
     pg_pool.query(query, (err, result) => {
       if (err) {
         console.error(err);
       } else {
         for (let i = 0; i < result.rows.length; i++) {
-          if (result.rows[i].name == data.name) {
-            /* const query2 = 'UPDATE ai SET code = $1 WHERE name = $2;';
+          if (result.rows[i].name == data.name &&
+              result.rows[i].uploader == client.id) {
+            const query2 = 'UPDATE ai SET code = $1 WHERE name = $2;';
             const vars2  = [ data.code, data.name ];
 
             pg_pool.query(query2, vars2, (err2, result2) => {
               if (err2) {
                 console.error(err2);
               }
-            });*/
+
+              pg_pool.query('SELECT * FROM ai;', (err3, result3) => {
+                if (err3) {
+                  console.error(err3);
+                } else {
+                  io.emit('ai_players', result3.rows);
+                }
+              });
+            });
 
             return;
           }
         }
 
-        const query2 = 'INSERT INTO ai (name, code) VALUES ($1, $2);';
-        const vars2  = [ data.name, data.code ];
+        const query2 = `INSERT INTO ai (name, code, uploader)
+          VALUES ($1, $2, $3);`;
+
+        const vars2  = [ data.name, data.code, client.id ];
 
         pg_pool.query(query2, vars2, (err2, result2) => {
           if (err2) {
             console.error(err2);
           }
+
+          pg_pool.query('SELECT * FROM ai;', (err3, result3) => {
+            if (err3) {
+              console.error(err3);
+            } else {
+              io.emit('ai_players', result3.rows);
+            }
+          });
         });
       }
     });
