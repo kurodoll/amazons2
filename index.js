@@ -450,7 +450,8 @@ io.on('connection', (socket) => {
         board,
         parseInt(settings.turn_timer),
         game_logic,
-        AI
+        AI,
+        settings.ranked
     );
 
     matches[match_id] = game;
@@ -566,14 +567,16 @@ setInterval(() => {
       // Save match info
       const game_info = game.getInfo();
 
-      const query = 'INSERT INTO matches_json (match_info) VALUES ($1);';
-      const vars  = [ JSON.stringify(game_info) ];
+      if (game_info.ranked) {
+        const query = 'INSERT INTO matches_json (match_info) VALUES ($1);';
+        const vars  = [ JSON.stringify(game_info) ];
 
-      pg_pool.query(query, vars, (err, result) => {
-        if (err) {
-          console.error(err);
-        }
-      });
+        pg_pool.query(query, vars, (err, result) => {
+          if (err) {
+            console.error(err);
+          }
+        });
+      }
 
       delete matches[game_info.match_id];
       log(
@@ -584,7 +587,9 @@ setInterval(() => {
           game_info
       );
 
-      calculatePlayerRatings();
+      if (game_info.ranked) {
+        calculatePlayerRatings();
+      }
     }
   }
 }, 60000);

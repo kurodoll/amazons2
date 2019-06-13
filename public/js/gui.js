@@ -358,6 +358,7 @@ $(() => {
 
     socket.emit('match_start', {
       players:      invited_players,
+      ranked:       $('#ranked-match').prop('checked'),
       board_size:   $('#set-board-size').val(),
       piece_config: $('#set-pieces').val(),
       turn_timer:   $('#set-turn-timer').val() });

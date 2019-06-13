@@ -1,5 +1,5 @@
 class Amazons {
-  constructor(match_id, players, board, turn_timer, game_logic, ai) {
+  constructor(match_id, players, board, turn_timer, game_logic, ai, ranked) {
     this.match_id   = match_id;
     this.players    = players;
     this.board      = board;
@@ -7,6 +7,7 @@ class Amazons {
     this.turn_timer = turn_timer;
     this.game_logic = game_logic;
     this.ai         = ai;
+    this.ranked     = ranked;
 
     this.turn = 0;
     this.turn_ends = new Date().getTime() + this.turn_timer * 1000;
@@ -283,7 +284,8 @@ class Amazons {
       losers:        this.losers,
       winner:        this.winner,
       match_started: this.match_started,
-      match_ended:   this.match_ended };
+      match_ended:   this.match_ended,
+      ranked:        this.ranked };
   }
 }
 
