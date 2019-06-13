@@ -8,6 +8,7 @@ html {
 div.container {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 div#header {
   align-items: flex-end;
@@ -69,6 +70,9 @@ div#main-content {
   min-height: calc(100vh - 100px);
   background-color: rgba(0,0,0,0.25);
 }
+div#main-content div {
+  margin-bottom: 5px;
+}
 div#users-list-container {
   order: 1;
   display: flex;
@@ -82,7 +86,6 @@ div#users-list-box {
 }
 div#bot-list-box {
   order: 2;
-  margin-top: 10px;
   padding: 10px;
   width: 200px;
   background-color: rgba(0,0,0,0.25);
